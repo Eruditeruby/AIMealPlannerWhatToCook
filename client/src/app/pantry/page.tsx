@@ -7,7 +7,7 @@ import api from '@/lib/api';
 import IngredientInput from '@/components/IngredientInput';
 import PantryList from '@/components/PantryList';
 import Button from '@/components/ui/Button';
-import { ChefHat } from 'lucide-react';
+import { ChefHat, Refrigerator, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function PantryPage() {
@@ -63,33 +63,72 @@ export default function PantryPage() {
   };
 
   if (authLoading || loading) {
-    return <div className="text-center py-16 text-[var(--text-secondary)]">Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-3">
+        <div className="w-8 h-8 border-3 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+        <span className="text-[var(--text-secondary)]">Loading your pantry...</span>
+      </div>
+    );
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="max-w-2xl mx-auto"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="max-w-3xl mx-auto"
     >
-      <h1 className="text-2xl font-bold mb-6">My Pantry</h1>
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-8">
+        <div className="p-2.5 bg-[var(--accent)]/10 rounded-xl">
+          <Refrigerator size={28} className="text-[var(--accent)]" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--text)]">My Pantry</h1>
+          <p className="text-sm text-[var(--text-secondary)]">
+            {items.length === 0
+              ? 'Add ingredients you have at home'
+              : `${items.length} ingredient${items.length !== 1 ? 's' : ''} in your pantry`}
+          </p>
+        </div>
+      </div>
 
-      <IngredientInput onAdd={handleAdd} existingItems={items} />
+      {/* Add Ingredient Section */}
+      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-5 mb-6">
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-3">
+          Add ingredients
+        </label>
+        <IngredientInput onAdd={handleAdd} existingItems={items} />
+      </div>
 
-      <div className="mt-6">
+      {/* Pantry Items Section */}
+      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-5 mb-6 min-h-[120px]">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-medium text-[var(--text-secondary)]">Your ingredients</h2>
+          {items.length > 0 && (
+            <span className="text-xs text-[var(--text-secondary)] bg-[var(--background)] px-2.5 py-1 rounded-full">
+              {items.length} item{items.length !== 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
         <PantryList items={items} onRemove={handleRemove} />
       </div>
 
+      {/* Cook Button */}
       {items.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-8 text-center"
+          transition={{ delay: 0.1 }}
         >
-          <Button onClick={handleCook} className="text-lg px-8 py-3">
-            <ChefHat size={20} className="inline mr-2" />
+          <button
+            onClick={handleCook}
+            className="w-full py-4 rounded-2xl font-semibold text-lg text-white bg-gradient-to-r from-[var(--accent)] to-emerald-500 hover:from-[var(--accent-hover)] hover:to-emerald-600 transition-all shadow-lg shadow-[var(--accent)]/20 hover:shadow-xl hover:shadow-[var(--accent)]/30 flex items-center justify-center gap-3 active:scale-[0.98]"
+          >
+            <Sparkles size={22} />
             What Can I Cook?
-          </Button>
+            <ChefHat size={22} />
+          </button>
         </motion.div>
       )}
     </motion.div>

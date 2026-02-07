@@ -16,6 +16,9 @@ jest.mock('lucide-react', () => ({
   ChefHat: (props: any) => <span data-testid="chef-hat-icon" {...props} />,
   Plus: (props: any) => <span data-testid="plus-icon" {...props} />,
   X: (props: any) => <span data-testid="x-icon" {...props} />,
+  Refrigerator: (props: any) => <span data-testid="fridge-icon" {...props} />,
+  Sparkles: (props: any) => <span data-testid="sparkles-icon" {...props} />,
+  ShoppingBasket: (props: any) => <span data-testid="basket-icon" {...props} />,
 }));
 jest.mock('framer-motion', () => ({
   motion: {
@@ -197,7 +200,7 @@ describe('Pantry page', () => {
       </AuthProvider>
     );
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Loading your pantry...')).toBeInTheDocument();
   });
 
   it('calls PUT API when adding ingredient', async () => {

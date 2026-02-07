@@ -6,6 +6,7 @@ import PantryList from '@/components/PantryList';
 // Mock dependencies
 jest.mock('lucide-react', () => ({
   X: (props: any) => <span data-testid="x-icon" {...props} />,
+  ShoppingBasket: (props: any) => <span data-testid="basket-icon" {...props} />,
 }));
 jest.mock('framer-motion', () => ({
   motion: {
