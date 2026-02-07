@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import RecipesPage from '@/app/recipes/page';
 import { AuthProvider } from '@/context/AuthContext';
@@ -17,7 +18,7 @@ jest.mock('next/navigation', () => ({
 jest.mock('lucide-react', () => ({
   Clock: (props: any) => <span data-testid="clock-icon" {...props} />,
   Users: (props: any) => <span data-testid="users-icon" {...props} />,
-  Heart: (props: any) => <span data-testid="heart-icon" {...props} />,
+  Heart: ({ fill, ...props }: any) => <span data-testid="heart-icon" data-fill={fill} {...props} />,
 }));
 jest.mock('framer-motion', () => ({
   motion: {
@@ -85,8 +86,9 @@ describe('Recipes page', () => {
 
   it('calls suggest API with ingredients', async () => {
     (api.get as jest.Mock)
-      .mockResolvedValueOnce(mockUser)
-      .mockResolvedValueOnce({ recipes: mockRecipes });
+      .mockResolvedValueOnce(mockUser)        // auth/me
+      .mockResolvedValueOnce({ recipes: mockRecipes }) // suggest
+      .mockResolvedValueOnce([]);              // saved
 
     render(
       <AuthProvider>
@@ -102,7 +104,8 @@ describe('Recipes page', () => {
   it('renders RecipeCards', async () => {
     (api.get as jest.Mock)
       .mockResolvedValueOnce(mockUser)
-      .mockResolvedValueOnce({ recipes: mockRecipes });
+      .mockResolvedValueOnce({ recipes: mockRecipes })
+      .mockResolvedValueOnce([]);
 
     render(
       <AuthProvider>
@@ -120,7 +123,8 @@ describe('Recipes page', () => {
   it('shows no recipes message', async () => {
     (api.get as jest.Mock)
       .mockResolvedValueOnce(mockUser)
-      .mockResolvedValueOnce({ recipes: [] });
+      .mockResolvedValueOnce({ recipes: [] })
+      .mockResolvedValueOnce([]);
 
     render(
       <AuthProvider>
@@ -152,7 +156,8 @@ describe('Recipes page', () => {
   it('displays ingredients being searched', async () => {
     (api.get as jest.Mock)
       .mockResolvedValueOnce(mockUser)
-      .mockResolvedValueOnce({ recipes: mockRecipes });
+      .mockResolvedValueOnce({ recipes: mockRecipes })
+      .mockResolvedValueOnce([]);
 
     render(
       <AuthProvider>
@@ -182,7 +187,8 @@ describe('Recipes page', () => {
   it('renders page title', async () => {
     (api.get as jest.Mock)
       .mockResolvedValueOnce(mockUser)
-      .mockResolvedValueOnce({ recipes: mockRecipes });
+      .mockResolvedValueOnce({ recipes: mockRecipes })
+      .mockResolvedValueOnce([]);
 
     render(
       <AuthProvider>
@@ -211,26 +217,6 @@ describe('Recipes page', () => {
     });
   });
 
-  it('saves recipe via API', async () => {
-    (api.get as jest.Mock)
-      .mockResolvedValueOnce(mockUser)
-      .mockResolvedValueOnce({ recipes: mockRecipes });
-    (api.post as jest.Mock).mockResolvedValue({});
-
-    render(
-      <AuthProvider>
-        <RecipesPage />
-      </AuthProvider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('Tomato Soup')).toBeInTheDocument();
-    });
-
-    // Recipe cards should be rendered, and save functionality would be tested
-    // in RecipeCard component tests
-  });
-
   it('handles generic error message', async () => {
     (api.get as jest.Mock)
       .mockResolvedValueOnce(mockUser)
@@ -244,6 +230,103 @@ describe('Recipes page', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Failed to fetch recipes')).toBeInTheDocument();
+    });
+  });
+
+  it('fetches saved recipes on mount to track saved state', async () => {
+    (api.get as jest.Mock)
+      .mockResolvedValueOnce(mockUser)
+      .mockResolvedValueOnce({ recipes: mockRecipes })
+      .mockResolvedValueOnce([]);
+
+    render(
+      <AuthProvider>
+        <RecipesPage />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith('/recipes/saved');
+    });
+  });
+
+  it('shows filled heart for already-saved recipes', async () => {
+    (api.get as jest.Mock).mockImplementation((url: string) => {
+      if (url === '/auth/me') return Promise.resolve(mockUser);
+      if (url.startsWith('/recipes/suggest')) return Promise.resolve({ recipes: mockRecipes });
+      if (url === '/recipes/saved') return Promise.resolve([{ _id: 'saved1', sourceId: '1', title: 'Tomato Soup' }]);
+      return Promise.reject(new Error('Unknown URL'));
+    });
+
+    render(
+      <AuthProvider>
+        <RecipesPage />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Tomato Soup')).toBeInTheDocument();
+    });
+
+    const hearts = screen.getAllByTestId('heart-icon');
+    // First recipe (Tomato Soup, id=1) is saved, second (Onion Rings) is not
+    expect(hearts[0]).toHaveAttribute('data-fill', 'currentColor');
+    expect(hearts[1]).toHaveAttribute('data-fill', 'none');
+  });
+
+  it('saves a recipe and updates heart on click', async () => {
+    (api.get as jest.Mock)
+      .mockResolvedValueOnce(mockUser)
+      .mockResolvedValueOnce({ recipes: mockRecipes })
+      .mockResolvedValueOnce([]);
+    (api.post as jest.Mock).mockResolvedValue({ _id: 'new-saved-id' });
+
+    const user = userEvent.setup();
+    render(
+      <AuthProvider>
+        <RecipesPage />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Tomato Soup')).toBeInTheDocument();
+    });
+
+    const saveButtons = screen.getAllByRole('button', { name: 'Save recipe' });
+    await user.click(saveButtons[0]);
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/recipes/saved', expect.objectContaining({
+        title: 'Tomato Soup',
+        source: 'spoonacular',
+      }));
+    });
+  });
+
+  it('unsaves a recipe when clicking filled heart', async () => {
+    (api.get as jest.Mock)
+      .mockResolvedValueOnce(mockUser)
+      .mockResolvedValueOnce({ recipes: mockRecipes })
+      .mockResolvedValueOnce([{ _id: 'saved1', sourceId: '1', title: 'Tomato Soup' }]);
+    (api.delete as jest.Mock).mockResolvedValue({});
+
+    const user = userEvent.setup();
+    render(
+      <AuthProvider>
+        <RecipesPage />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Tomato Soup')).toBeInTheDocument();
+    });
+
+    // First recipe is saved, so its button says "Unsave recipe"
+    const unsaveButton = screen.getByRole('button', { name: 'Unsave recipe' });
+    await user.click(unsaveButton);
+
+    await waitFor(() => {
+      expect(api.delete).toHaveBeenCalledWith('/recipes/saved/saved1');
     });
   });
 });

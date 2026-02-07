@@ -130,4 +130,21 @@ describe('RecipeCard', () => {
     render(<RecipeCard recipe={recipeNoServings} />);
     expect(screen.queryByTestId('users-icon')).not.toBeInTheDocument();
   });
+
+  it('has red text class on save button when isSaved', () => {
+    const onSave = jest.fn();
+    render(<RecipeCard recipe={mockRecipe} onSave={onSave} isSaved />);
+    const button = screen.getByRole('button', { name: 'Unsave recipe' });
+    expect(button.className).toContain('text-red-500');
+  });
+
+  it('does not have red text class on save button when not saved', () => {
+    const onSave = jest.fn();
+    render(<RecipeCard recipe={mockRecipe} onSave={onSave} isSaved={false} />);
+    const button = screen.getByRole('button', { name: 'Save recipe' });
+    // The class list includes 'hover:text-red-500' but should NOT have standalone 'text-red-500'
+    const classes = button.className.split(/\s+/);
+    expect(classes).not.toContain('text-red-500');
+    expect(button.className).toContain('text-[var(--text-secondary)]');
+  });
 });

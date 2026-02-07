@@ -156,6 +156,68 @@ describe('POST /api/recipes/saved', () => {
       .send({ title: 'No source or ingredients' });
     expect(res.status).toBe(400);
   });
+
+  test('returns 409 when saving duplicate recipe by sourceId', async () => {
+    const payload = {
+      title: 'Dup Recipe', source: 'spoonacular', sourceId: '999',
+      ingredients: ['a', 'b'],
+    };
+
+    const first = await request(app)
+      .post('/api/recipes/saved')
+      .set('Cookie', `token=${token}`)
+      .send(payload);
+    expect(first.status).toBe(201);
+
+    const second = await request(app)
+      .post('/api/recipes/saved')
+      .set('Cookie', `token=${token}`)
+      .send(payload);
+    expect(second.status).toBe(409);
+    expect(second.body.error).toBe('Recipe already saved');
+    expect(second.body.recipe._id).toBe(first.body._id);
+  });
+
+  test('returns 409 when saving duplicate recipe by title (no sourceId)', async () => {
+    const payload = {
+      title: 'AI Dup Recipe', source: 'ai', ingredients: ['x'],
+    };
+
+    const first = await request(app)
+      .post('/api/recipes/saved')
+      .set('Cookie', `token=${token}`)
+      .send(payload);
+    expect(first.status).toBe(201);
+
+    const second = await request(app)
+      .post('/api/recipes/saved')
+      .set('Cookie', `token=${token}`)
+      .send(payload);
+    expect(second.status).toBe(409);
+  });
+
+  test('allows different users to save same recipe', async () => {
+    const user2 = await User.create({
+      googleId: 'g-456', email: 'user2@example.com', name: 'User2', avatar: null,
+    });
+    const token2 = generateToken(user2);
+    const payload = {
+      title: 'Shared Recipe', source: 'spoonacular', sourceId: '888',
+      ingredients: ['a'],
+    };
+
+    const res1 = await request(app)
+      .post('/api/recipes/saved')
+      .set('Cookie', `token=${token}`)
+      .send(payload);
+    expect(res1.status).toBe(201);
+
+    const res2 = await request(app)
+      .post('/api/recipes/saved')
+      .set('Cookie', `token=${token2}`)
+      .send(payload);
+    expect(res2.status).toBe(201);
+  });
 });
 
 describe('GET /api/recipes/saved', () => {
