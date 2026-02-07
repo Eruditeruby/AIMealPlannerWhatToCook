@@ -2,30 +2,31 @@
 
 > **Methodology**: Test-Driven Development (Red → Green → Refactor)
 > **Reference**: [design.md](./design.md)
+> **Status**: Phases 0-13 COMPLETE (264 tests). Phases 14-15 remaining.
 
 ---
 
 ## Phase 0: Project Scaffolding & Test Infrastructure
 
 ### 0.1 Initialize Server Project
-- [ ] `mkdir server && cd server && npm init -y`
-- [ ] Install production deps: `express mongoose passport passport-google-oauth20 jsonwebtoken cookie-parser cors dotenv`
-- [ ] Install dev deps: `jest supertest mongodb-memory-server @types/jest nodemon`
-- [ ] Create `jest.config.js` with test environment settings
-- [ ] Create `.env.example` with all env vars from design doc
-- [ ] Create `server/index.js` entry point (empty Express app, export for testing)
+- [x] `mkdir server && cd server && npm init -y`
+- [x] Install production deps: `express mongoose passport passport-google-oauth20 jsonwebtoken cookie-parser cors dotenv`
+- [x] Install dev deps: `jest supertest mongodb-memory-server @types/jest nodemon`
+- [x] Create `jest.config.js` with test environment settings
+- [x] Create `.env.example` with all env vars from design doc
+- [x] Create `server/index.js` entry point (empty Express app, export for testing)
 
 ### 0.2 Initialize Client Project
-- [ ] `npx create-next-app@14 client --app --tailwind --eslint`
-- [ ] Install deps: `framer-motion lucide-react`
-- [ ] Install dev deps: `@testing-library/react @testing-library/jest-dom jest jest-environment-jsdom`
-- [ ] Create `jest.config.js` for Next.js
-- [ ] Set up Tailwind CSS variables for dark/light theming in `globals.css`
+- [x] `npx create-next-app@14 client --app --tailwind --eslint`
+- [x] Install deps: `framer-motion lucide-react`
+- [x] Install dev deps: `@testing-library/react @testing-library/jest-dom jest jest-environment-jsdom`
+- [x] Create `jest.config.js` for Next.js
+- [x] Set up Tailwind CSS variables for dark/light theming in `globals.css`
 
 ### 0.3 Git & Config
-- [ ] Create `.gitignore` (node_modules, .env, .DS_Store, coverage/)
-- [ ] Create `.env.example` at root
-- [ ] Initial commit
+- [x] Create `.gitignore` (node_modules, .env, .DS_Store, coverage/)
+- [x] Create `.env.example` at root
+- [x] Initial commit
 
 ---
 
@@ -34,48 +35,48 @@
 ### 1.1 MongoDB Connection
 
 **Test first** (`server/__tests__/config/db.test.js`):
-- [ ] Test: `connectDB()` connects to in-memory MongoDB successfully
-- [ ] Test: `connectDB()` throws on invalid URI
-- [ ] **Implement**: `server/config/db.js` — Mongoose connect function
-- [ ] Refactor: extract connection options to config
+- [x] Test: `connectDB()` connects to in-memory MongoDB successfully
+- [x] Test: `connectDB()` throws on invalid URI
+- [x] **Implement**: `server/config/db.js` — Mongoose connect function
+- [x] Refactor: extract connection options to config
 
 ### 1.2 User Model
 
 **Test first** (`server/__tests__/models/User.test.js`):
-- [ ] Test: creates a valid user with googleId, email, name, avatar
-- [ ] Test: `googleId` is required
-- [ ] Test: `email` is required
-- [ ] Test: `createdAt` defaults to now
-- [ ] Test: `preferences.dietaryRestrictions` defaults to empty array
-- [ ] Test: `preferences.familySize` defaults to null
-- [ ] Test: rejects duplicate `googleId`
-- [ ] **Implement**: `server/models/User.js` — Mongoose schema + model
-- [ ] Refactor: add index on `googleId`
+- [x] Test: creates a valid user with googleId, email, name, avatar
+- [x] Test: `googleId` is required
+- [x] Test: `email` is required
+- [x] Test: `createdAt` defaults to now
+- [x] Test: `preferences.dietaryRestrictions` defaults to empty array
+- [x] Test: `preferences.familySize` defaults to null
+- [x] Test: rejects duplicate `googleId`
+- [x] **Implement**: `server/models/User.js` — Mongoose schema + model
+- [x] Refactor: add index on `googleId`
 
 ### 1.3 Pantry Model
 
 **Test first** (`server/__tests__/models/Pantry.test.js`):
-- [ ] Test: creates a pantry with userId and items array
-- [ ] Test: `userId` is required
-- [ ] Test: `items` defaults to empty array
-- [ ] Test: `items` only accepts strings
-- [ ] Test: `createdAt` and `updatedAt` are auto-set
-- [ ] Test: one pantry per user (unique userId)
-- [ ] **Implement**: `server/models/Pantry.js` — Mongoose schema + model
-- [ ] Refactor: add index on `userId`
+- [x] Test: creates a pantry with userId and items array
+- [x] Test: `userId` is required
+- [x] Test: `items` defaults to empty array
+- [x] Test: `items` only accepts strings
+- [x] Test: `createdAt` and `updatedAt` are auto-set
+- [x] Test: one pantry per user (unique userId)
+- [x] **Implement**: `server/models/Pantry.js` — Mongoose schema + model
+- [x] Refactor: add index on `userId`
 
 ### 1.4 SavedRecipe Model
 
 **Test first** (`server/__tests__/models/SavedRecipe.test.js`):
-- [ ] Test: creates a saved recipe with all required fields (userId, title, source, ingredients)
-- [ ] Test: `source` only accepts "spoonacular" or "ai"
-- [ ] Test: `nutrition` sub-document has calories, protein, carbs, fat
-- [ ] Test: `tags` defaults to empty array
-- [ ] Test: `savedAt` defaults to now
-- [ ] Test: `sourceId` is optional (null for AI recipes)
-- [ ] Test: user can save multiple recipes
-- [ ] **Implement**: `server/models/SavedRecipe.js` — Mongoose schema + model
-- [ ] Refactor: add compound index on `userId` + `savedAt`
+- [x] Test: creates a saved recipe with all required fields (userId, title, source, ingredients)
+- [x] Test: `source` only accepts "spoonacular" or "ai"
+- [x] Test: `nutrition` sub-document has calories, protein, carbs, fat
+- [x] Test: `tags` defaults to empty array
+- [x] Test: `savedAt` defaults to now
+- [x] Test: `sourceId` is optional (null for AI recipes)
+- [x] Test: user can save multiple recipes
+- [x] **Implement**: `server/models/SavedRecipe.js` — Mongoose schema + model
+- [x] Refactor: add compound index on `userId` + `savedAt`
 
 ---
 
@@ -84,24 +85,24 @@
 ### 2.1 JWT Auth Middleware
 
 **Test first** (`server/__tests__/middleware/auth.test.js`):
-- [ ] Test: returns 401 if no token cookie present
-- [ ] Test: returns 401 if token is invalid/expired
-- [ ] Test: sets `req.user` with decoded payload on valid token
-- [ ] Test: calls `next()` on valid token
-- [ ] Test: handles malformed JWT gracefully (no crash)
-- [ ] **Implement**: `server/middleware/auth.js` — verify JWT from httpOnly cookie
-- [ ] Refactor: extract token extraction logic
+- [x] Test: returns 401 if no token cookie present
+- [x] Test: returns 401 if token is invalid/expired
+- [x] Test: sets `req.user` with decoded payload on valid token
+- [x] Test: calls `next()` on valid token
+- [x] Test: handles malformed JWT gracefully (no crash)
+- [x] **Implement**: `server/middleware/auth.js` — verify JWT from httpOnly cookie
+- [x] Refactor: extract token extraction logic
 
 ### 2.2 JWT Token Utility
 
 **Test first** (`server/__tests__/utils/token.test.js`):
-- [ ] Test: `generateToken(user)` returns a valid JWT string
-- [ ] Test: token contains userId and email in payload
-- [ ] Test: token expires in configured time (e.g. 7 days)
-- [ ] Test: `verifyToken(token)` returns decoded payload
-- [ ] Test: `verifyToken(invalidToken)` throws error
-- [ ] **Implement**: `server/utils/token.js` — generateToken, verifyToken
-- [ ] Refactor: make expiry configurable via env
+- [x] Test: `generateToken(user)` returns a valid JWT string
+- [x] Test: token contains userId and email in payload
+- [x] Test: token expires in configured time (e.g. 7 days)
+- [x] Test: `verifyToken(token)` returns decoded payload
+- [x] Test: `verifyToken(invalidToken)` throws error
+- [x] **Implement**: `server/utils/token.js` — generateToken, verifyToken
+- [x] Refactor: make expiry configurable via env
 
 ---
 
@@ -110,23 +111,23 @@
 ### 3.1 Passport Google Strategy Config
 
 **Test first** (`server/__tests__/config/passport.test.js`):
-- [ ] Test: strategy is registered as "google"
-- [ ] Test: callback creates new user if googleId not found
-- [ ] Test: callback returns existing user if googleId found
-- [ ] Test: user object has id, email, name, avatar
-- [ ] **Implement**: `server/config/passport.js` — Google OAuth strategy
-- [ ] Refactor: extract user upsert logic
+- [x] Test: strategy is registered as "google"
+- [x] Test: callback creates new user if googleId not found
+- [x] Test: callback returns existing user if googleId found
+- [x] Test: user object has id, email, name, avatar
+- [x] **Implement**: `server/config/passport.js` — Google OAuth strategy
+- [x] Refactor: extract user upsert logic
 
 ### 3.2 Auth Route Endpoints
 
 **Test first** (`server/__tests__/routes/auth.test.js`):
-- [ ] Test: `GET /api/auth/google` redirects to Google (status 302)
-- [ ] Test: `GET /api/auth/me` returns 401 without token
-- [ ] Test: `GET /api/auth/me` returns user profile with valid token
-- [ ] Test: `GET /api/auth/me` response shape: `{ id, email, name, avatar, preferences }`
-- [ ] Test: `POST /api/auth/logout` clears the JWT cookie
-- [ ] **Implement**: `server/routes/auth.js` — auth router
-- [ ] Refactor: add logout endpoint
+- [x] Test: `GET /api/auth/google` redirects to Google (status 302)
+- [x] Test: `GET /api/auth/me` returns 401 without token
+- [x] Test: `GET /api/auth/me` returns user profile with valid token
+- [x] Test: `GET /api/auth/me` response shape: `{ id, email, name, avatar, preferences }`
+- [x] Test: `POST /api/auth/logout` clears the JWT cookie
+- [x] **Implement**: `server/routes/auth.js` — auth router
+- [x] Refactor: add logout endpoint
 
 ---
 
@@ -135,26 +136,26 @@
 ### 4.1 GET /api/pantry
 
 **Test first** (`server/__tests__/routes/pantry.test.js`):
-- [ ] Test: returns 401 without auth
-- [ ] Test: returns empty pantry `{ items: [] }` for new user
-- [ ] Test: returns existing pantry items for authenticated user
-- [ ] Test: response shape: `{ items: [...], updatedAt }`
-- [ ] **Implement**: GET handler in `server/routes/pantry.js`
+- [x] Test: returns 401 without auth
+- [x] Test: returns empty pantry `{ items: [] }` for new user
+- [x] Test: returns existing pantry items for authenticated user
+- [x] Test: response shape: `{ items: [...], updatedAt }`
+- [x] **Implement**: GET handler in `server/routes/pantry.js`
 
 ### 4.2 PUT /api/pantry
 
 **Test first** (same file):
-- [ ] Test: returns 401 without auth
-- [ ] Test: creates pantry if none exists, sets items
-- [ ] Test: updates existing pantry items (full replace)
-- [ ] Test: accepts `{ items: ["chicken", "rice"] }`
-- [ ] Test: rejects non-array items (400)
-- [ ] Test: rejects non-string items in array (400)
-- [ ] Test: trims and lowercases item names
-- [ ] Test: removes duplicate items
-- [ ] Test: updates `updatedAt` timestamp
-- [ ] **Implement**: PUT handler in `server/routes/pantry.js`
-- [ ] Refactor: extract input validation to middleware/helper
+- [x] Test: returns 401 without auth
+- [x] Test: creates pantry if none exists, sets items
+- [x] Test: updates existing pantry items (full replace)
+- [x] Test: accepts `{ items: ["chicken", "rice"] }`
+- [x] Test: rejects non-array items (400)
+- [x] Test: rejects non-string items in array (400)
+- [x] Test: trims and lowercases item names
+- [x] Test: removes duplicate items
+- [x] Test: updates `updatedAt` timestamp
+- [x] **Implement**: PUT handler in `server/routes/pantry.js`
+- [x] Refactor: extract input validation to middleware/helper
 
 ---
 
@@ -163,27 +164,27 @@
 ### 5.1 Spoonacular Client
 
 **Test first** (`server/__tests__/services/spoonacular.test.js`):
-- [ ] Test: `findByIngredients(["chicken", "rice"])` calls correct Spoonacular URL
-- [ ] Test: returns normalized recipe array `[{ id, title, image, usedIngredients, missedIngredients }]`
-- [ ] Test: `getRecipeDetails(id)` returns full recipe (instructions, nutrition, etc.)
-- [ ] Test: handles Spoonacular API error (returns empty array, logs error)
-- [ ] Test: handles rate limit (402) gracefully
-- [ ] Test: handles empty ingredients list (returns empty array)
-- [ ] **Implement**: `server/services/spoonacular.js` — API client with fetch
-- [ ] Refactor: add response caching (in-memory, 1 hour TTL)
+- [x] Test: `findByIngredients(["chicken", "rice"])` calls correct Spoonacular URL
+- [x] Test: returns normalized recipe array `[{ id, title, image, usedIngredients, missedIngredients }]`
+- [x] Test: `getRecipeDetails(id)` returns full recipe (instructions, nutrition, etc.)
+- [x] Test: handles Spoonacular API error (returns empty array, logs error)
+- [x] Test: handles rate limit (402) gracefully
+- [x] Test: handles empty ingredients list (returns empty array)
+- [x] **Implement**: `server/services/spoonacular.js` — API client with fetch
+- [x] Refactor: add response caching (in-memory, 1 hour TTL)
 
 ### 5.2 OpenRouter AI Client
 
 **Test first** (`server/__tests__/services/openrouter.test.js`):
-- [ ] Test: `suggestRecipes(["chicken", "rice"])` sends correct prompt to OpenRouter
-- [ ] Test: prompt includes "family-friendly" instruction
-- [ ] Test: returns normalized recipe array matching app schema
-- [ ] Test: parses AI JSON response correctly
-- [ ] Test: handles malformed AI response (returns empty array)
-- [ ] Test: handles API error (returns empty array, logs error)
-- [ ] Test: handles empty ingredients list (returns empty array)
-- [ ] **Implement**: `server/services/openrouter.js` — OpenRouter chat completions client
-- [ ] Refactor: extract prompt template, make model configurable
+- [x] Test: `suggestRecipes(["chicken", "rice"])` sends correct prompt to OpenRouter
+- [x] Test: prompt includes "family-friendly" instruction
+- [x] Test: returns normalized recipe array matching app schema
+- [x] Test: parses AI JSON response correctly
+- [x] Test: handles malformed AI response (returns empty array)
+- [x] Test: handles API error (returns empty array, logs error)
+- [x] Test: handles empty ingredients list (returns empty array)
+- [x] **Implement**: `server/services/openrouter.js` — OpenRouter chat completions client
+- [x] Refactor: extract prompt template, make model configurable
 
 ---
 
@@ -192,54 +193,54 @@
 ### 6.1 GET /api/recipes/suggest
 
 **Test first** (`server/__tests__/routes/recipes.test.js`):
-- [ ] Test: returns 401 without auth
-- [ ] Test: returns 400 if no `ingredients` query param
-- [ ] Test: calls Spoonacular with parsed ingredients
-- [ ] Test: if Spoonacular returns 3+ results, returns them without AI call
-- [ ] Test: if Spoonacular returns < 3 results, also calls OpenRouter
-- [ ] Test: merges Spoonacular + AI results, marks source on each
-- [ ] Test: response shape: `{ recipes: [{ title, image, source, sourceId, ingredients, cookTime, servings }] }`
-- [ ] Test: handles both services failing (returns empty array + message)
-- [ ] **Implement**: GET handler in `server/routes/recipes.js`
-- [ ] Refactor: extract suggestion logic to a service
+- [x] Test: returns 401 without auth
+- [x] Test: returns 400 if no `ingredients` query param
+- [x] Test: calls Spoonacular with parsed ingredients
+- [x] Test: if Spoonacular returns 3+ results, returns them without AI call
+- [x] Test: if Spoonacular returns < 3 results, also calls OpenRouter
+- [x] Test: merges Spoonacular + AI results, marks source on each
+- [x] Test: response shape: `{ recipes: [{ title, image, source, sourceId, ingredients, cookTime, servings }] }`
+- [x] Test: handles both services failing (returns empty array + message)
+- [x] **Implement**: GET handler in `server/routes/recipes.js`
+- [x] Refactor: extract suggestion logic to a service
 
 ### 6.2 GET /api/recipes/:id
 
 **Test first** (same file):
-- [ ] Test: returns 401 without auth
-- [ ] Test: returns recipe detail from Spoonacular by sourceId
-- [ ] Test: returns 404 for unknown recipe ID
-- [ ] Test: response includes instructions, nutrition, full ingredients
-- [ ] **Implement**: GET detail handler
+- [x] Test: returns 401 without auth
+- [x] Test: returns recipe detail from Spoonacular by sourceId
+- [x] Test: returns 404 for unknown recipe ID
+- [x] Test: response includes instructions, nutrition, full ingredients
+- [x] **Implement**: GET detail handler
 
 ### 6.3 POST /api/recipes/saved
 
 **Test first** (same file):
-- [ ] Test: returns 401 without auth
-- [ ] Test: saves recipe to user's saved list
-- [ ] Test: returns 400 if required fields missing (title, source, ingredients)
-- [ ] Test: accepts valid recipe payload and returns saved document
-- [ ] Test: does not duplicate if same sourceId already saved by user
-- [ ] **Implement**: POST handler
+- [x] Test: returns 401 without auth
+- [x] Test: saves recipe to user's saved list
+- [x] Test: returns 400 if required fields missing (title, source, ingredients)
+- [x] Test: accepts valid recipe payload and returns saved document
+- [x] Test: does not duplicate if same sourceId already saved by user
+- [x] **Implement**: POST handler
 
 ### 6.4 GET /api/recipes/saved
 
 **Test first** (same file):
-- [ ] Test: returns 401 without auth
-- [ ] Test: returns empty array for user with no saved recipes
-- [ ] Test: returns all saved recipes for authenticated user
-- [ ] Test: results sorted by `savedAt` descending
-- [ ] **Implement**: GET saved handler
+- [x] Test: returns 401 without auth
+- [x] Test: returns empty array for user with no saved recipes
+- [x] Test: returns all saved recipes for authenticated user
+- [x] Test: results sorted by `savedAt` descending
+- [x] **Implement**: GET saved handler
 
 ### 6.5 DELETE /api/recipes/saved/:id
 
 **Test first** (same file):
-- [ ] Test: returns 401 without auth
-- [ ] Test: deletes saved recipe by ID
-- [ ] Test: returns 404 if recipe not found or doesn't belong to user
-- [ ] Test: cannot delete another user's saved recipe
-- [ ] **Implement**: DELETE handler
-- [ ] Refactor: ensure all recipe routes use consistent error format
+- [x] Test: returns 401 without auth
+- [x] Test: deletes saved recipe by ID
+- [x] Test: returns 404 if recipe not found or doesn't belong to user
+- [x] Test: cannot delete another user's saved recipe
+- [x] **Implement**: DELETE handler
+- [x] Refactor: ensure all recipe routes use consistent error format
 
 ---
 
@@ -248,14 +249,14 @@
 ### 7.1 Express App Setup
 
 **Test first** (`server/__tests__/app.test.js`):
-- [ ] Test: app responds to `GET /api/health` with `{ status: "ok" }`
-- [ ] Test: CORS allows configured client origin
-- [ ] Test: unknown routes return 404 JSON
-- [ ] Test: JSON parsing middleware works
-- [ ] Test: cookie parser is configured
-- [ ] **Implement**: `server/index.js` — assemble Express app with all routes
-- [ ] Add unhandled rejection / uncaught exception handlers
-- [ ] Refactor: separate app creation from server listen (for testability)
+- [x] Test: app responds to `GET /api/health` with `{ status: "ok" }`
+- [x] Test: CORS allows configured client origin
+- [x] Test: unknown routes return 404 JSON
+- [x] Test: JSON parsing middleware works
+- [x] Test: cookie parser is configured
+- [x] **Implement**: `server/index.js` — assemble Express app with all routes
+- [x] Add unhandled rejection / uncaught exception handlers
+- [x] Refactor: separate app creation from server listen (for testability)
 
 ---
 
@@ -264,29 +265,29 @@
 ### 8.1 ThemeContext
 
 **Test first** (`client/__tests__/context/ThemeContext.test.js`):
-- [ ] Test: provides default theme ("light")
-- [ ] Test: `toggleTheme()` switches from light to dark
-- [ ] Test: `toggleTheme()` switches from dark to light
-- [ ] Test: persists theme preference in localStorage
-- [ ] Test: reads initial theme from localStorage
-- [ ] Test: sets `data-theme` attribute on document
-- [ ] **Implement**: `client/context/ThemeContext.js`
-- [ ] Refactor: respect system preference via `prefers-color-scheme`
+- [x] Test: provides default theme ("light")
+- [x] Test: `toggleTheme()` switches from light to dark
+- [x] Test: `toggleTheme()` switches from dark to light
+- [x] Test: persists theme preference in localStorage
+- [x] Test: reads initial theme from localStorage
+- [x] Test: sets `data-theme` attribute on document
+- [x] **Implement**: `client/context/ThemeContext.js`
+- [x] Refactor: respect system preference via `prefers-color-scheme`
 
 ### 8.2 ThemeToggle Component
 
 **Test first** (`client/__tests__/components/ThemeToggle.test.js`):
-- [ ] Test: renders sun icon in dark mode
-- [ ] Test: renders moon icon in light mode
-- [ ] Test: calls `toggleTheme` on click
-- [ ] Test: has accessible label
-- [ ] **Implement**: `client/components/ThemeToggle.jsx`
+- [x] Test: renders sun icon in dark mode
+- [x] Test: renders moon icon in light mode
+- [x] Test: calls `toggleTheme` on click
+- [x] Test: has accessible label
+- [x] **Implement**: `client/components/ThemeToggle.jsx`
 
 ### 8.3 Global Styles & CSS Variables
 
-- [ ] Set up Tailwind CSS variables in `globals.css` for light/dark tokens
-- [ ] Test: verify color tokens match design spec (visual test)
-- [ ] Configure Inter font via next/font
+- [x] Set up Tailwind CSS variables in `globals.css` for light/dark tokens
+- [x] Test: verify color tokens match design spec (visual test)
+- [x] Configure Inter font via next/font
 
 ---
 
@@ -295,25 +296,25 @@
 ### 9.1 API Client
 
 **Test first** (`client/__tests__/lib/api.test.js`):
-- [ ] Test: `api.get(url)` calls fetch with credentials: "include"
-- [ ] Test: `api.post(url, data)` sends JSON body with correct headers
-- [ ] Test: `api.put(url, data)` sends JSON body
-- [ ] Test: `api.delete(url)` sends DELETE request
-- [ ] Test: throws on non-OK response with error message
-- [ ] Test: uses `NEXT_PUBLIC_API_URL` as base URL
-- [ ] **Implement**: `client/lib/api.js` — fetch wrapper
+- [x] Test: `api.get(url)` calls fetch with credentials: "include"
+- [x] Test: `api.post(url, data)` sends JSON body with correct headers
+- [x] Test: `api.put(url, data)` sends JSON body
+- [x] Test: `api.delete(url)` sends DELETE request
+- [x] Test: throws on non-OK response with error message
+- [x] Test: uses `NEXT_PUBLIC_API_URL` as base URL
+- [x] **Implement**: `client/lib/api.js` — fetch wrapper
 
 ### 9.2 AuthContext
 
 **Test first** (`client/__tests__/context/AuthContext.test.js`):
-- [ ] Test: provides `user: null` initially
-- [ ] Test: `checkAuth()` calls `/api/auth/me` and sets user
-- [ ] Test: `checkAuth()` sets user to null on 401
-- [ ] Test: provides `isAuthenticated` boolean
-- [ ] Test: provides `isLoading` state during auth check
-- [ ] Test: `login()` redirects to `/api/auth/google`
-- [ ] Test: `logout()` calls logout endpoint and clears user
-- [ ] **Implement**: `client/context/AuthContext.js`
+- [x] Test: provides `user: null` initially
+- [x] Test: `checkAuth()` calls `/api/auth/me` and sets user
+- [x] Test: `checkAuth()` sets user to null on 401
+- [x] Test: provides `isAuthenticated` boolean
+- [x] Test: provides `isLoading` state during auth check
+- [x] Test: `login()` redirects to `/api/auth/google`
+- [x] Test: `logout()` calls logout endpoint and clears user
+- [x] **Implement**: `client/context/AuthContext.js`
 
 ---
 
@@ -322,40 +323,40 @@
 ### 10.1 Navbar
 
 **Test first** (`client/__tests__/components/Navbar.test.js`):
-- [ ] Test: renders app name/logo
-- [ ] Test: shows "Sign in" button when not authenticated
-- [ ] Test: shows user avatar + name when authenticated
-- [ ] Test: shows navigation links (Pantry, Recipes, Favorites) when authenticated
-- [ ] Test: includes ThemeToggle
-- [ ] Test: is responsive (hamburger menu on mobile)
-- [ ] **Implement**: `client/components/Navbar.jsx`
+- [x] Test: renders app name/logo
+- [x] Test: shows "Sign in" button when not authenticated
+- [x] Test: shows user avatar + name when authenticated
+- [x] Test: shows navigation links (Pantry, Recipes, Favorites) when authenticated
+- [x] Test: includes ThemeToggle
+- [x] Test: is responsive (hamburger menu on mobile)
+- [x] **Implement**: `client/components/Navbar.jsx`
 
 ### 10.2 Button Component
 
 **Test first** (`client/__tests__/components/ui/Button.test.js`):
-- [ ] Test: renders children text
-- [ ] Test: applies variant styles (primary, secondary, ghost)
-- [ ] Test: handles click events
-- [ ] Test: shows loading spinner when `isLoading`
-- [ ] Test: is disabled when `disabled` prop set
-- [ ] **Implement**: `client/components/ui/Button.jsx`
+- [x] Test: renders children text
+- [x] Test: applies variant styles (primary, secondary, ghost)
+- [x] Test: handles click events
+- [x] Test: shows loading spinner when `isLoading`
+- [x] Test: is disabled when `disabled` prop set
+- [x] **Implement**: `client/components/ui/Button.jsx`
 
 ### 10.3 Card Component
 
 **Test first** (`client/__tests__/components/ui/Card.test.js`):
-- [ ] Test: renders children
-- [ ] Test: applies hover animation class
-- [ ] Test: accepts className prop for customization
-- [ ] **Implement**: `client/components/ui/Card.jsx`
+- [x] Test: renders children
+- [x] Test: applies hover animation class
+- [x] Test: accepts className prop for customization
+- [x] **Implement**: `client/components/ui/Card.jsx`
 
 ### 10.4 Input Component
 
 **Test first** (`client/__tests__/components/ui/Input.test.js`):
-- [ ] Test: renders with label
-- [ ] Test: handles onChange events
-- [ ] Test: shows error message when provided
-- [ ] Test: supports placeholder
-- [ ] **Implement**: `client/components/ui/Input.jsx`
+- [x] Test: renders with label
+- [x] Test: handles onChange events
+- [x] Test: shows error message when provided
+- [x] Test: supports placeholder
+- [x] **Implement**: `client/components/ui/Input.jsx`
 
 ---
 
@@ -364,35 +365,35 @@
 ### 11.1 IngredientInput Component
 
 **Test first** (`client/__tests__/components/IngredientInput.test.js`):
-- [ ] Test: renders input field with "Add ingredient" placeholder
-- [ ] Test: calls `onAdd(ingredient)` on Enter key press
-- [ ] Test: calls `onAdd(ingredient)` on "Add" button click
-- [ ] Test: clears input after adding
-- [ ] Test: does not add empty/whitespace-only strings
-- [ ] Test: trims input before adding
-- [ ] **Implement**: `client/components/IngredientInput.jsx`
+- [x] Test: renders input field with "Add ingredient" placeholder
+- [x] Test: calls `onAdd(ingredient)` on Enter key press
+- [x] Test: calls `onAdd(ingredient)` on "Add" button click
+- [x] Test: clears input after adding
+- [x] Test: does not add empty/whitespace-only strings
+- [x] Test: trims input before adding
+- [x] **Implement**: `client/components/IngredientInput.jsx`
 
 ### 11.2 PantryList Component
 
 **Test first** (`client/__tests__/components/PantryList.test.js`):
-- [ ] Test: renders list of ingredient items
-- [ ] Test: each item has a remove button (X)
-- [ ] Test: calls `onRemove(item)` when remove clicked
-- [ ] Test: shows empty state message when no items
-- [ ] Test: items animate in/out with Framer Motion
-- [ ] **Implement**: `client/components/PantryList.jsx`
+- [x] Test: renders list of ingredient items
+- [x] Test: each item has a remove button (X)
+- [x] Test: calls `onRemove(item)` when remove clicked
+- [x] Test: shows empty state message when no items
+- [x] Test: items animate in/out with Framer Motion
+- [x] **Implement**: `client/components/PantryList.jsx`
 
 ### 11.3 Pantry Page
 
 **Test first** (`client/__tests__/app/pantry/page.test.js`):
-- [ ] Test: redirects to auth if not logged in
-- [ ] Test: loads and displays user's pantry on mount
-- [ ] Test: adding an ingredient calls PUT /api/pantry with updated list
-- [ ] Test: removing an ingredient calls PUT /api/pantry with updated list
-- [ ] Test: shows loading skeleton while fetching
-- [ ] Test: shows "What Can I Cook?" button when pantry has items
-- [ ] Test: "What Can I Cook?" navigates to /recipes with ingredients param
-- [ ] **Implement**: `client/app/pantry/page.js`
+- [x] Test: redirects to auth if not logged in
+- [x] Test: loads and displays user's pantry on mount
+- [x] Test: adding an ingredient calls PUT /api/pantry with updated list
+- [x] Test: removing an ingredient calls PUT /api/pantry with updated list
+- [x] Test: shows loading skeleton while fetching
+- [x] Test: shows "What Can I Cook?" button when pantry has items
+- [x] Test: "What Can I Cook?" navigates to /recipes with ingredients param
+- [x] **Implement**: `client/app/pantry/page.js`
 
 ---
 
@@ -401,59 +402,59 @@
 ### 12.1 RecipeCard Component
 
 **Test first** (`client/__tests__/components/RecipeCard.test.js`):
-- [ ] Test: renders recipe title
-- [ ] Test: renders recipe image (with fallback if none)
-- [ ] Test: shows cook time and servings
-- [ ] Test: shows source badge ("Spoonacular" or "AI")
-- [ ] Test: shows save/heart button
-- [ ] Test: calls `onSave(recipe)` on heart click
-- [ ] Test: navigates to recipe detail on card click
-- [ ] Test: has hover animation
-- [ ] **Implement**: `client/components/RecipeCard.jsx`
+- [x] Test: renders recipe title
+- [x] Test: renders recipe image (with fallback if none)
+- [x] Test: shows cook time and servings
+- [x] Test: shows source badge ("Spoonacular" or "AI")
+- [x] Test: shows save/heart button
+- [x] Test: calls `onSave(recipe)` on heart click
+- [x] Test: navigates to recipe detail on card click
+- [x] Test: has hover animation
+- [x] **Implement**: `client/components/RecipeCard.jsx`
 
 ### 12.2 RecipeDetail Component
 
 **Test first** (`client/__tests__/components/RecipeDetail.test.js`):
-- [ ] Test: renders recipe title and image
-- [ ] Test: renders ingredients list
-- [ ] Test: renders step-by-step instructions
-- [ ] Test: renders cook time and servings
-- [ ] Test: renders nutrition info (calories, protein, carbs, fat)
-- [ ] Test: renders tags (kid-friendly, etc.)
-- [ ] Test: shows save button
-- [ ] **Implement**: `client/components/RecipeDetail.jsx`
+- [x] Test: renders recipe title and image
+- [x] Test: renders ingredients list
+- [x] Test: renders step-by-step instructions
+- [x] Test: renders cook time and servings
+- [x] Test: renders nutrition info (calories, protein, carbs, fat)
+- [x] Test: renders tags (kid-friendly, etc.)
+- [x] Test: shows save button
+- [x] **Implement**: `client/components/RecipeDetail.jsx`
 
 ### 12.3 Recipes Page (Suggestions)
 
 **Test first** (`client/__tests__/app/recipes/page.test.js`):
-- [ ] Test: redirects to auth if not logged in
-- [ ] Test: reads ingredients from query params
-- [ ] Test: calls GET /api/recipes/suggest with ingredients
-- [ ] Test: displays loading skeleton while fetching
-- [ ] Test: renders grid of RecipeCards with results
-- [ ] Test: shows "No recipes found" message on empty results
-- [ ] Test: shows error message on API failure
-- [ ] **Implement**: `client/app/recipes/page.js`
+- [x] Test: redirects to auth if not logged in
+- [x] Test: reads ingredients from query params
+- [x] Test: calls GET /api/recipes/suggest with ingredients
+- [x] Test: displays loading skeleton while fetching
+- [x] Test: renders grid of RecipeCards with results
+- [x] Test: shows "No recipes found" message on empty results
+- [x] Test: shows error message on API failure
+- [x] **Implement**: `client/app/recipes/page.js`
 
 ### 12.4 Recipe Detail Page
 
 **Test first** (`client/__tests__/app/recipes/[id]/page.test.js`):
-- [ ] Test: redirects to auth if not logged in
-- [ ] Test: calls GET /api/recipes/:id on mount
-- [ ] Test: renders RecipeDetail component with fetched data
-- [ ] Test: shows loading skeleton while fetching
-- [ ] Test: shows 404 message for invalid ID
-- [ ] **Implement**: `client/app/recipes/[id]/page.js`
+- [x] Test: redirects to auth if not logged in
+- [x] Test: calls GET /api/recipes/:id on mount
+- [x] Test: renders RecipeDetail component with fetched data
+- [x] Test: shows loading skeleton while fetching
+- [x] Test: shows 404 message for invalid ID
+- [x] **Implement**: `client/app/recipes/[id]/page.js`
 
 ### 12.5 Favorites Page
 
 **Test first** (`client/__tests__/app/favorites/page.test.js`):
-- [ ] Test: redirects to auth if not logged in
-- [ ] Test: calls GET /api/recipes/saved on mount
-- [ ] Test: renders grid of saved RecipeCards
-- [ ] Test: shows empty state when no favorites
-- [ ] Test: unsave removes card from list (calls DELETE, updates UI)
-- [ ] **Implement**: `client/app/favorites/page.js`
+- [x] Test: redirects to auth if not logged in
+- [x] Test: calls GET /api/recipes/saved on mount
+- [x] Test: renders grid of saved RecipeCards
+- [x] Test: shows empty state when no favorites
+- [x] Test: unsave removes card from list (calls DELETE, updates UI)
+- [x] **Implement**: `client/app/favorites/page.js`
 
 ---
 
@@ -462,21 +463,21 @@
 ### 13.1 Root Layout
 
 **Test first** (`client/__tests__/app/layout.test.js`):
-- [ ] Test: wraps children with AuthContext provider
-- [ ] Test: wraps children with ThemeContext provider
-- [ ] Test: renders Navbar
-- [ ] Test: applies Inter font
-- [ ] **Implement**: `client/app/layout.js`
+- [x] Test: wraps children with AuthContext provider
+- [x] Test: wraps children with ThemeContext provider
+- [x] Test: renders Navbar
+- [x] Test: applies Inter font
+- [x] **Implement**: `client/app/layout.js`
 
 ### 13.2 Landing Page
 
 **Test first** (`client/__tests__/app/page.test.js`):
-- [ ] Test: renders hero section with app title and tagline
-- [ ] Test: shows "Get Started" button linking to auth
-- [ ] Test: shows feature highlights (pantry, recipes, favorites)
-- [ ] Test: has smooth entrance animations (Framer Motion)
-- [ ] Test: redirects to /pantry if already authenticated
-- [ ] **Implement**: `client/app/page.js`
+- [x] Test: renders hero section with app title and tagline
+- [x] Test: shows "Get Started" button linking to auth
+- [x] Test: shows feature highlights (pantry, recipes, favorites)
+- [x] Test: has smooth entrance animations (Framer Motion)
+- [x] Test: redirects to /pantry if already authenticated
+- [x] **Implement**: `client/app/page.js`
 
 ---
 

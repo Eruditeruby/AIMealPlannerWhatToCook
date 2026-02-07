@@ -9,9 +9,9 @@ Family-focused AI meal planner that suggests recipes based on pantry ingredients
 
 ```
 AIMealPlannerWhatToCook/
-├── server/                 # Node.js/Express backend
+├── server/                 # Node.js/Express 5 backend
 │   ├── config/            # db.js, passport.js
-│   ├── models/            # User, Pantry, SavedRecipe (Mongoose)
+│   ├── models/            # User, Pantry, SavedRecipe (Mongoose 9)
 │   ├── routes/            # auth, pantry, recipes
 │   ├── services/          # spoonacular.js, openrouter.js
 │   ├── middleware/        # auth.js (JWT verification)
@@ -19,14 +19,22 @@ AIMealPlannerWhatToCook/
 │   ├── __tests__/         # 13 test files, 83 tests
 │   ├── index.js           # Express app entry point
 │   └── jest.config.js     # Test configuration
-├── client/                # Next.js 14 frontend
+├── client/                # Next.js 14 frontend (TypeScript)
 │   ├── src/
 │   │   ├── app/           # Pages: home, pantry, recipes, favorites
+│   │   │   ├── layout.tsx       # Root layout + providers + Navbar
+│   │   │   ├── page.tsx         # Landing page (hero + features)
+│   │   │   ├── providers.tsx    # ThemeProvider + AuthProvider
+│   │   │   ├── pantry/page.tsx  # Pantry management
+│   │   │   ├── recipes/page.tsx # Recipe suggestions
+│   │   │   ├── recipes/[id]/page.tsx # Recipe detail
+│   │   │   └── favorites/page.tsx    # Saved recipes
 │   │   ├── components/    # Navbar, RecipeCard, PantryList, UI primitives
 │   │   ├── context/       # AuthContext, ThemeContext
 │   │   └── lib/           # api.ts (fetch wrapper)
+│   ├── __tests__/         # 18 test files, 181 tests
 │   ├── tailwind.config.ts
-│   └── tsconfig.json
+│   └── jest.config.js
 ├── design.md              # Full architecture spec
 ├── workflow.md            # TDD workflow (15 phases)
 ├── CLAUDE.md              # Project instructions
@@ -71,7 +79,7 @@ AIMealPlannerWhatToCook/
 
 ## Test Coverage
 
-**Server: 83 tests, 13 suites — all passing**
+### Server: 83 tests, 13 suites — all passing (83% statements)
 
 | Suite | Tests |
 |-------|-------|
@@ -89,7 +97,28 @@ AIMealPlannerWhatToCook/
 | OpenRouter client | 6 |
 | App integration | 3 |
 
-**Client: No unit tests yet (build verified)**
+### Client: 181 tests, 18 suites — all passing (94% statements, 95% lines)
+
+| Suite | Tests |
+|-------|-------|
+| ThemeContext | 6 |
+| AuthContext | 9 |
+| API client | 8 |
+| Button | 11 |
+| Card | 6 |
+| Input | 11 |
+| ThemeToggle | 5 |
+| Navbar | 8 |
+| IngredientInput | 9 |
+| PantryList | 8 |
+| RecipeCard | 14 |
+| RecipeDetail | 18 |
+| Home page | 10 |
+| Pantry page | 11 |
+| Recipes page | 11 |
+| Recipe detail page | 11 |
+| Favorites page | 12 |
+| Layout | 13 |
 
 ## Key Dependencies
 
@@ -101,7 +130,7 @@ express 5, mongoose 9, passport + google-oauth20, jsonwebtoken, cors, cookie-par
 ### Client
 next 14, react 18, framer-motion, lucide-react, tailwindcss
 
-**Dev:** jest, @testing-library/react, typescript
+**Dev:** jest 30, ts-jest, @testing-library/react, @testing-library/jest-dom, @testing-library/user-event, typescript 5
 
 ## Environment Variables
 
@@ -117,5 +146,11 @@ cd server && npm install && npm run dev
 cd client && npm install && npm run dev
 
 # Tests
-cd server && npm test
+cd server && npm test        # 83 tests
+cd client && npm test        # 181 tests
 ```
+
+## Remaining Work
+
+- Phase 14: Integration testing (server E2E flow, Playwright e2e)
+- Phase 15: Polish & deployment (error boundary, rate limiting, Docker, security)
