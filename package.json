@@ -1,0 +1,32 @@
+{
+  "name": "ai-meal-planner",
+  "version": "1.0.0",
+  "description": "AI Meal Planner - What To Cook",
+  "scripts": {
+    "test:server": "cd server && npm test",
+    "test:client": "cd client && npm test",
+    "test:integration": "cd server && npm run test:integration",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
+    "test:all": "npm run test:server && npm run test:client && npm run test:integration",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "playwright:install": "playwright install"
+  },
+  "keywords": [
+    "meal-planner",
+    "recipes",
+    "ai",
+    "spoonacular",
+    "openrouter"
+  ],
+  "author": "Rubisha Saini",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "playwright": "^1.49.1"
+  }
+}
