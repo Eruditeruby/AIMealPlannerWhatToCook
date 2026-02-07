@@ -24,6 +24,7 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-2 text-[var(--accent)] font-bold text-lg">
           <ChefHat size={24} />
           What To Cook
+          <span className="text-[10px] font-normal text-[var(--text-secondary)] self-end mb-0.5">v1.0.0</span>
         </Link>
 
         {/* Desktop nav */}
