@@ -9,8 +9,17 @@ app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:3000', creden
 app.use(express.json());
 app.use(cookieParser());
 
+// Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
+});
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/pantry', require('./routes/pantry'));
+app.use('/api/recipes', require('./routes/recipes'));
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
 });
 
 const PORT = process.env.PORT || 5000;
