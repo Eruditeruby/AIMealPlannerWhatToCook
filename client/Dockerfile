@@ -5,9 +5,13 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# Build (skip lint in Docker — run next build directly)
+# Accept build-time env vars for Next.js NEXT_PUBLIC_* inlining
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# Build
 COPY . .
-RUN npx next build
+RUN echo "Building with NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" && npx next build
 
 # Production
 FROM node:20-alpine AS runner
