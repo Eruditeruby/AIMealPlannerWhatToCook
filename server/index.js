@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const { debugError } = require('./utils/debug');
 const { configurePassport } = require('./config/passport');
 
 const app = express();
@@ -74,7 +75,7 @@ app.use((req, res) => {
 
 // Global error handler — hide stack traces in production
 app.use((err, req, res, _next) => {
-  console.error('[Error]', req.method, req.path, err.message);
+  debugError('[Error]', req.method, req.path, err.message);
   const status = err.status || 500;
   const message = process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message;
   res.status(status).json({ error: message });

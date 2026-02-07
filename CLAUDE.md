@@ -23,7 +23,8 @@ AIMealPlannerWhatToCook/
 │   ├── app/         # Pages (auth, pantry, recipes, favorites)
 │   ├── components/  # UI components + feature components
 │   ├── context/     # AuthContext, ThemeContext
-│   ├── lib/         # API client (fetch wrapper)
+│   ├── data/        # Static data (ingredients list)
+│   ├── lib/         # API client, debug utility
 │   └── styles/      # Tailwind + CSS variables
 ├── server/          # Express API backend
 │   ├── config/      # db.js, passport.js
@@ -31,7 +32,7 @@ AIMealPlannerWhatToCook/
 │   ├── models/      # User, Pantry, SavedRecipe (Mongoose)
 │   ├── routes/      # auth, pantry, recipes
 │   ├── services/    # spoonacular.js, openrouter.js
-│   └── utils/       # token.js
+│   └── utils/       # token.js, debug.js
 ├── design.md        # Full architecture & design spec
 ├── workflow.md      # TDD implementation workflow (15 phases)
 └── CLAUDE.md        # This file
@@ -39,7 +40,7 @@ AIMealPlannerWhatToCook/
 
 ## Key Design Decisions
 
-- Pantry tracks **item names only** (no quantities)
+- Pantry tracks **item names only** (no quantities) with autocomplete (~350 ingredients)
 - Recipe flow: Spoonacular first → OpenRouter AI fallback if < 3 results
 - Dark/light mode via CSS variables + `data-theme` attribute
 - Minimalist UI with smooth Framer Motion transitions
@@ -73,9 +74,13 @@ See `.env.example` for full list. Required:
 - `OPENROUTER_API_KEY`
 - `NEXT_PUBLIC_API_URL`
 
+Optional:
+- `DEBUG=true` — Enable server-side debug logging
+- `NEXT_PUBLIC_DEBUG=true` — Enable client-side debug logging
+
 ## Development Methodology
 
-**TDD (Test-Driven Development)**: Red → Green → Refactor for every feature. See `workflow.md` for the full 15-phase plan. Actual test count: 264 tests (exceeded the ~140 estimate).
+**TDD (Test-Driven Development)**: Red → Green → Refactor for every feature. See `workflow.md` for the full 15-phase plan. Actual test count: 271 tests (exceeded the ~140 estimate).
 
 ## Commands
 
@@ -96,11 +101,11 @@ cd client && npm run dev           # Dev server (Next.js)
 - [x] TDD workflow defined (workflow.md)
 - [x] Phase 0: Scaffolding & test infrastructure
 - [x] Phase 1-7: Server implementation (83 tests, 13 suites, 83% coverage)
-- [x] Phase 8-13: Client implementation (181 tests, 18 suites, 94% coverage)
+- [x] Phase 8-13: Client implementation (188 tests, 18 suites, 94% coverage)
 - [ ] Phase 14: Integration testing
 - [ ] Phase 15: Polish & deployment
 
-**Total: 264 tests across 31 suites — all passing**
+**Total: 271 tests across 31 suites — all passing**
 
 ## Conventions
 

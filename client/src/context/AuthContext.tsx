@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '@/lib/api';
+import { debug } from '@/lib/debug';
 
 interface User {
   id: string;
@@ -45,8 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = () => {
     const loginUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/google`;
-    console.log('[Auth] Login redirect URL:', loginUrl);
-    console.log('[Auth] NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+    debug('[Auth] Login redirect URL:', loginUrl);
+    debug('[Auth] NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
     window.location.href = loginUrl;
   };
 

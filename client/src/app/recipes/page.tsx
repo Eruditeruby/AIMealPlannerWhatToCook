@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import api from '@/lib/api';
+import { debug, debugError } from '@/lib/debug';
 import RecipeCard from '@/components/RecipeCard';
 import { motion } from 'framer-motion';
 
@@ -33,13 +34,13 @@ function RecipesContent() {
     try {
       setLoading(true);
       setError('');
-      console.log('[Recipes] Fetching recipes for ingredients:', ingredients);
+      debug('[Recipes] Fetching recipes for ingredients:', ingredients);
       const data = await api.get(`/recipes/suggest?ingredients=${ingredients}`);
-      console.log('[Recipes] Response:', JSON.stringify(data).slice(0, 500));
-      console.log('[Recipes] Recipe count:', data.recipes?.length ?? 'no recipes key');
+      debug('[Recipes] Response:', JSON.stringify(data).slice(0, 500));
+      debug('[Recipes] Recipe count:', data.recipes?.length ?? 'no recipes key');
       setRecipes(data.recipes || []);
     } catch (err: any) {
-      console.error('[Recipes] Fetch error:', err.message, err);
+      debugError('[Recipes] Fetch error:', err.message, err);
       setError(err.message || 'Failed to fetch recipes');
     } finally {
       setLoading(false);
@@ -59,13 +60,13 @@ function RecipesContent() {
       tags: recipe.tags || [],
       nutrition: recipe.nutrition || {},
     };
-    console.log('[Save] Saving recipe:', recipe.title);
-    console.log('[Save] Payload:', JSON.stringify(payload).slice(0, 500));
+    debug('[Save] Saving recipe:', recipe.title);
+    debug('[Save] Payload:', JSON.stringify(payload).slice(0, 500));
     try {
       const result = await api.post('/recipes/saved', payload);
-      console.log('[Save] Success:', result);
+      debug('[Save] Success:', result);
     } catch (err: any) {
-      console.error('[Save] Error:', err.message, err);
+      debugError('[Save] Error:', err.message, err);
     }
   };
 

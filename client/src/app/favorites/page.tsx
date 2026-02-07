@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import { debug, debugError } from '@/lib/debug';
 import RecipeCard from '@/components/RecipeCard';
 import { motion } from 'framer-motion';
 
@@ -27,25 +28,25 @@ export default function FavoritesPage() {
 
   const fetchFavorites = async () => {
     try {
-      console.log('[Favorites] Fetching saved recipes...');
+      debug('[Favorites] Fetching saved recipes...');
       const data = await api.get('/recipes/saved');
-      console.log('[Favorites] Got', data?.length, 'saved recipes');
+      debug('[Favorites] Got', data?.length, 'saved recipes');
       setRecipes(data);
     } catch (err: any) {
-      console.error('[Favorites] Fetch error:', err.message, err);
+      debugError('[Favorites] Fetch error:', err.message, err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleUnsave = async (recipe: any) => {
-    console.log('[Favorites] Unsaving recipe:', recipe._id, recipe.title);
+    debug('[Favorites] Unsaving recipe:', recipe._id, recipe.title);
     try {
       await api.delete(`/recipes/saved/${recipe._id}`);
-      console.log('[Favorites] Unsave success');
+      debug('[Favorites] Unsave success');
       setRecipes((prev) => prev.filter((r) => r._id !== recipe._id));
     } catch (err: any) {
-      console.error('[Favorites] Unsave error:', err.message, err);
+      debugError('[Favorites] Unsave error:', err.message, err);
     }
   };
 

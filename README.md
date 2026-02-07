@@ -5,7 +5,7 @@ A family-focused AI meal planner that suggests recipes based on available ingred
 ## Features
 
 - **Google OAuth** — Secure login with Google
-- **Pantry Management** — Track ingredients you have at home
+- **Pantry Management** — Track ingredients with autocomplete (~350 ingredients)
 - **Smart Recipe Suggestions** — Spoonacular API + OpenRouter AI fallback
 - **Save Favorites** — Bookmark recipes for later
 - **Dark/Light Mode** — Smooth theme switching with CSS variables
@@ -36,7 +36,7 @@ AIMealPlannerWhatToCook/
 │   ├── models/            # User, Pantry, SavedRecipe
 │   ├── routes/            # auth, pantry, recipes
 │   ├── services/          # spoonacular.js, openrouter.js
-│   ├── utils/             # token.js
+│   ├── utils/             # token.js, debug.js
 │   ├── __tests__/         # 13 suites, 83 tests
 │   └── index.js           # Entry point
 ├── client/                # Next.js 15 frontend
@@ -44,7 +44,8 @@ AIMealPlannerWhatToCook/
 │       ├── app/           # Pages (home, pantry, recipes, favorites)
 │       ├── components/    # UI + feature components
 │       ├── context/       # AuthContext, ThemeContext
-│       ├── lib/           # API client (fetch wrapper)
+│       ├── data/          # Static data (ingredients list)
+│       ├── lib/           # API client, debug utility
 │       └── __tests__/     # 18 suites, 181 tests
 ├── design.md              # Architecture & design spec
 ├── workflow.md            # TDD implementation workflow
@@ -103,6 +104,8 @@ See `.env.example` for the full list. Required:
 | `SPOONACULAR_API_KEY` | Spoonacular API key |
 | `OPENROUTER_API_KEY` | OpenRouter API key |
 | `NEXT_PUBLIC_API_URL` | Client-side API base URL |
+| `DEBUG` | Set to `true` to enable server debug logging (optional) |
+| `NEXT_PUBLIC_DEBUG` | Set to `true` to enable client debug logging (optional) |
 
 ## API Endpoints
 
@@ -127,7 +130,7 @@ See `.env.example` for the full list. Required:
 # Server tests (83 tests, 13 suites)
 cd server && npm test
 
-# Client tests (181 tests, 18 suites)
+# Client tests (188 tests, 18 suites)
 cd client && npm test
 
 # With coverage
@@ -135,7 +138,7 @@ cd server && npm test -- --coverage    # 83% statements
 cd client && npm test -- --coverage    # 94% statements, 95% lines
 ```
 
-**Total: 264 tests across 31 suites — all passing**
+**Total: 271 tests across 31 suites — all passing**
 
 ## Development Status
 

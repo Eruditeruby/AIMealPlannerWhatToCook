@@ -1,3 +1,4 @@
+const { debug, debugError } = require('../utils/debug');
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 const buildPrompt = (ingredients) => {
@@ -27,7 +28,7 @@ const suggestRecipes = async (ingredients) => {
 
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
-    console.log('[OpenRouter] API key present:', !!apiKey, 'length:', apiKey?.length);
+    debug('[OpenRouter] API key present:', !!apiKey, 'length:', apiKey?.length);
     const res = await fetch(OPENROUTER_URL, {
       method: 'POST',
       headers: {
@@ -39,20 +40,20 @@ const suggestRecipes = async (ingredients) => {
         messages: [{ role: 'user', content: buildPrompt(ingredients) }],
       }),
     });
-    console.log('[OpenRouter] Response status:', res.status, res.statusText);
+    debug('[OpenRouter] Response status:', res.status, res.statusText);
 
     if (!res.ok) {
       const errorBody = await res.text();
-      console.error('[OpenRouter] Error body:', errorBody.slice(0, 500));
+      debugError('[OpenRouter] Error body:', errorBody.slice(0, 500));
       return [];
     }
 
     const data = await res.json();
     const content = data.choices?.[0]?.message?.content;
-    console.log('[OpenRouter] Raw content (first 300):', content?.slice(0, 300));
+    debug('[OpenRouter] Raw content (first 300):', content?.slice(0, 300));
 
     const parsed = JSON.parse(content);
-    console.log('[OpenRouter] Parsed recipes count:', parsed.recipes?.length);
+    debug('[OpenRouter] Parsed recipes count:', parsed.recipes?.length);
     return (parsed.recipes || []).map((recipe) => ({
       ...recipe,
       source: 'ai',

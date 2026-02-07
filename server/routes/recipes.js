@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { debug, debugError } = require('../utils/debug');
 const authMiddleware = require('../middleware/auth');
 const spoonacular = require('../services/spoonacular');
 const openrouter = require('../services/openrouter');
@@ -11,31 +12,31 @@ const MIN_SPOONACULAR_RESULTS = 3;
 router.get('/suggest', authMiddleware, async (req, res) => {
   try {
     const { ingredients } = req.query;
-    console.log('[/suggest] ingredients query:', ingredients);
-    console.log('[/suggest] user:', req.user?.userId);
+    debug('[/suggest] ingredients query:', ingredients);
+    debug('[/suggest] user:', req.user?.userId);
     if (!ingredients) {
       return res.status(400).json({ error: 'ingredients query param required' });
     }
 
     const ingredientList = ingredients.split(',').map((i) => i.trim()).filter(Boolean);
-    console.log('[/suggest] ingredientList:', ingredientList);
+    debug('[/suggest] ingredientList:', ingredientList);
 
     let spoonResults = await spoonacular.findByIngredients(ingredientList);
-    console.log('[/suggest] spoonacular results:', spoonResults.length);
+    debug('[/suggest] spoonacular results:', spoonResults.length);
     spoonResults = spoonResults.map((r) => ({ ...r, source: 'spoonacular' }));
 
     let aiResults = [];
     if (spoonResults.length < MIN_SPOONACULAR_RESULTS) {
-      console.log('[/suggest] spoonacular < 3, calling OpenRouter...');
+      debug('[/suggest] spoonacular < 3, calling OpenRouter...');
       aiResults = await openrouter.suggestRecipes(ingredientList);
-      console.log('[/suggest] OpenRouter results:', aiResults.length);
+      debug('[/suggest] OpenRouter results:', aiResults.length);
     }
 
     const recipes = [...spoonResults, ...aiResults];
-    console.log('[/suggest] total recipes:', recipes.length);
+    debug('[/suggest] total recipes:', recipes.length);
     res.json({ recipes });
   } catch (err) {
-    console.error('[/suggest] ERROR:', err.message, err.stack);
+    debugError('[/suggest] ERROR:', err.message, err.stack);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -54,10 +55,10 @@ router.get('/saved', authMiddleware, async (req, res) => {
 router.post('/saved', authMiddleware, async (req, res) => {
   try {
     const { title, source, ingredients } = req.body;
-    console.log('[POST /saved] user:', req.user?.userId);
-    console.log('[POST /saved] body:', JSON.stringify(req.body).slice(0, 500));
+    debug('[POST /saved] user:', req.user?.userId);
+    debug('[POST /saved] body:', JSON.stringify(req.body).slice(0, 500));
     if (!title || !source || !ingredients) {
-      console.log('[POST /saved] Missing fields - title:', !!title, 'source:', !!source, 'ingredients:', !!ingredients);
+      debug('[POST /saved] Missing fields - title:', !!title, 'source:', !!source, 'ingredients:', !!ingredients);
       return res.status(400).json({ error: 'title, source, and ingredients are required' });
     }
 
@@ -65,10 +66,10 @@ router.post('/saved', authMiddleware, async (req, res) => {
       userId: req.user.userId,
       ...req.body,
     });
-    console.log('[POST /saved] Created recipe:', recipe._id);
+    debug('[POST /saved] Created recipe:', recipe._id);
     res.status(201).json(recipe);
   } catch (err) {
-    console.error('[POST /saved] ERROR:', err.message, err.stack);
+    debugError('[POST /saved] ERROR:', err.message, err.stack);
     res.status(500).json({ error: 'Server error' });
   }
 });
