@@ -15,6 +15,8 @@ function RecipesContent() {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  // Map of recipe key -> saved document _id
+  const [savedMap, setSavedMap] = useState<Record<string, string>>({});
 
   const ingredients = searchParams.get('ingredients') || '';
 
@@ -27,8 +29,26 @@ function RecipesContent() {
   useEffect(() => {
     if (isAuthenticated && ingredients) {
       fetchRecipes();
+      fetchSaved();
     }
   }, [isAuthenticated, ingredients]);
+
+  const getRecipeKey = (recipe: any) =>
+    recipe.sourceId || recipe.id?.toString() || recipe.title;
+
+  const fetchSaved = async () => {
+    try {
+      const data = await api.get('/recipes/saved');
+      const map: Record<string, string> = {};
+      for (const r of data) {
+        const key = r.sourceId || r.title;
+        map[key] = r._id;
+      }
+      setSavedMap(map);
+    } catch {
+      // ignore
+    }
+  };
 
   const fetchRecipes = async () => {
     try {
@@ -47,26 +67,45 @@ function RecipesContent() {
     }
   };
 
-  const handleSave = async (recipe: any) => {
-    const payload = {
-      title: recipe.title,
-      image: recipe.image,
-      source: recipe.source || 'spoonacular',
-      sourceId: recipe.id?.toString() || recipe.sourceId,
-      instructions: recipe.instructions || '',
-      ingredients: recipe.ingredients || recipe.usedIngredients || [],
-      cookTime: recipe.cookTime || null,
-      servings: recipe.servings || null,
-      tags: recipe.tags || [],
-      nutrition: recipe.nutrition || {},
-    };
-    debug('[Save] Saving recipe:', recipe.title);
-    debug('[Save] Payload:', JSON.stringify(payload).slice(0, 500));
-    try {
-      const result = await api.post('/recipes/saved', payload);
-      debug('[Save] Success:', result);
-    } catch (err: any) {
-      debugError('[Save] Error:', err.message, err);
+  const handleToggleSave = async (recipe: any) => {
+    const key = getRecipeKey(recipe);
+    const existingId = savedMap[key];
+
+    if (existingId) {
+      // Unsave
+      debug('[Save] Unsaving recipe:', recipe.title, existingId);
+      try {
+        await api.delete(`/recipes/saved/${existingId}`);
+        setSavedMap((prev) => {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        });
+      } catch (err: any) {
+        debugError('[Save] Unsave error:', err.message, err);
+      }
+    } else {
+      // Save
+      const payload = {
+        title: recipe.title,
+        image: recipe.image,
+        source: recipe.source || 'spoonacular',
+        sourceId: recipe.id?.toString() || recipe.sourceId,
+        instructions: recipe.instructions || '',
+        ingredients: recipe.ingredients || recipe.usedIngredients || [],
+        cookTime: recipe.cookTime || null,
+        servings: recipe.servings || null,
+        tags: recipe.tags || [],
+        nutrition: recipe.nutrition || {},
+      };
+      debug('[Save] Saving recipe:', recipe.title);
+      try {
+        const result = await api.post('/recipes/saved', payload);
+        setSavedMap((prev) => ({ ...prev, [key]: result._id }));
+        debug('[Save] Success:', result._id);
+      } catch (err: any) {
+        debugError('[Save] Error:', err.message, err);
+      }
     }
   };
 
@@ -96,7 +135,11 @@ function RecipesContent() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
             >
-              <RecipeCard recipe={recipe} onSave={handleSave} />
+              <RecipeCard
+                recipe={recipe}
+                onSave={handleToggleSave}
+                isSaved={!!savedMap[getRecipeKey(recipe)]}
+              />
             </motion.div>
           ))}
         </div>

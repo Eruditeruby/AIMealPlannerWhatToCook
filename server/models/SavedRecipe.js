@@ -56,5 +56,6 @@ const savedRecipeSchema = new mongoose.Schema({
 });
 
 savedRecipeSchema.index({ userId: 1, savedAt: -1 });
+savedRecipeSchema.index({ userId: 1, sourceId: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model('SavedRecipe', savedRecipeSchema);

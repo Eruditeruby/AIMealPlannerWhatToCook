@@ -62,6 +62,17 @@ router.post('/saved', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'title, source, and ingredients are required' });
     }
 
+    // Prevent duplicates: check by sourceId or title
+    const { sourceId } = req.body;
+    const query = sourceId
+      ? { userId: req.user.userId, sourceId }
+      : { userId: req.user.userId, title };
+    const existing = await SavedRecipe.findOne(query);
+    if (existing) {
+      debug('[POST /saved] Already saved:', existing._id);
+      return res.status(409).json({ error: 'Recipe already saved', recipe: existing });
+    }
+
     const recipe = await SavedRecipe.create({
       userId: req.user.userId,
       ...req.body,

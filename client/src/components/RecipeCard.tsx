@@ -72,7 +72,7 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
           <button
             onClick={(e) => { e.stopPropagation(); onSave(recipe); }}
             aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
-            className="text-[var(--text-secondary)] hover:text-red-500 transition-colors"
+            className={`transition-colors ${isSaved ? 'text-red-500' : 'text-[var(--text-secondary)] hover:text-red-500'}`}
           >
             <Heart size={18} fill={isSaved ? 'currentColor' : 'none'} />
           </button>
