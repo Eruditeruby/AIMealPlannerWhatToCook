@@ -44,7 +44,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/google`;
+    const loginUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/auth/google`;
+    console.log('[Auth] Login redirect URL:', loginUrl);
+    console.log('[Auth] NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+    window.location.href = loginUrl;
   };
 
   const logout = async () => {

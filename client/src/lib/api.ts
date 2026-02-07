@@ -1,5 +1,8 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
+console.log('[API] NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+console.log('[API] BASE_URL:', BASE_URL);
+
 async function request(url: string, options: RequestInit = {}) {
   const res = await fetch(`${BASE_URL}${url}`, {
     credentials: 'include',
