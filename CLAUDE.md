@@ -80,7 +80,7 @@ Optional:
 
 ## Development Methodology
 
-**TDD (Test-Driven Development)**: Red → Green → Refactor for every feature. See `workflow.md` for the full 15-phase plan. Actual test count: 271 tests (exceeded the ~140 estimate).
+**TDD (Test-Driven Development)**: Red → Green → Refactor for every feature. See `workflow.md` for the full 15-phase plan. Actual test count: 279 tests (exceeded the ~140 estimate).
 
 ## Commands
 
@@ -100,12 +100,12 @@ cd client && npm run dev           # Dev server (Next.js)
 - [x] Design spec complete (design.md)
 - [x] TDD workflow defined (workflow.md)
 - [x] Phase 0: Scaffolding & test infrastructure
-- [x] Phase 1-7: Server implementation (83 tests, 13 suites, 83% coverage)
-- [x] Phase 8-13: Client implementation (188 tests, 18 suites, 94% coverage)
+- [x] Phase 1-7: Server implementation (86 tests, 13 suites, 83% coverage)
+- [x] Phase 8-13: Client implementation (193 tests, 18 suites, 94% coverage)
 - [ ] Phase 14: Integration testing
 - [ ] Phase 15: Polish & deployment
 
-**Total: 271 tests across 31 suites — all passing**
+**Total: 279 tests across 31 suites — all passing**
 
 ## Conventions
 

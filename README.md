@@ -37,7 +37,7 @@ AIMealPlannerWhatToCook/
 │   ├── routes/            # auth, pantry, recipes
 │   ├── services/          # spoonacular.js, openrouter.js
 │   ├── utils/             # token.js, debug.js
-│   ├── __tests__/         # 13 suites, 83 tests
+│   ├── __tests__/         # 13 suites, 86 tests
 │   └── index.js           # Entry point
 ├── client/                # Next.js 15 frontend
 │   └── src/
@@ -46,7 +46,7 @@ AIMealPlannerWhatToCook/
 │       ├── context/       # AuthContext, ThemeContext
 │       ├── data/          # Static data (ingredients list)
 │       ├── lib/           # API client, debug utility
-│       └── __tests__/     # 18 suites, 181 tests
+│       └── __tests__/     # 18 suites, 193 tests
 ├── design.md              # Architecture & design spec
 ├── workflow.md            # TDD implementation workflow
 └── PROJECT_INDEX.md       # Session bootstrapping index
@@ -127,10 +127,10 @@ See `.env.example` for the full list. Required:
 ## Testing
 
 ```bash
-# Server tests (83 tests, 13 suites)
+# Server tests (86 tests, 13 suites)
 cd server && npm test
 
-# Client tests (188 tests, 18 suites)
+# Client tests (193 tests, 18 suites)
 cd client && npm test
 
 # With coverage
@@ -138,7 +138,7 @@ cd server && npm test -- --coverage    # 83% statements
 cd client && npm test -- --coverage    # 94% statements, 95% lines
 ```
 
-**Total: 271 tests across 31 suites — all passing**
+**Total: 279 tests across 31 suites — all passing**
 
 ## Development Status
 
