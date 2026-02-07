@@ -6,7 +6,7 @@ Family-focused AI meal planner that suggests recipes based on available ingredie
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14 (App Router) + Tailwind CSS + Framer Motion
+- **Frontend**: Next.js 15 (App Router) + Tailwind CSS + Framer Motion
 - **Backend**: Node.js + Express
 - **Database**: MongoDB (Mongoose ODM)
 - **Auth**: Google OAuth via Passport.js + JWT (httpOnly cookie)
@@ -19,7 +19,7 @@ Family-focused AI meal planner that suggests recipes based on available ingredie
 
 ```
 AIMealPlannerWhatToCook/
-├── client/          # Next.js 14 App Router frontend
+├── client/          # Next.js 15 App Router frontend
 │   ├── app/         # Pages (auth, pantry, recipes, favorites)
 │   ├── components/  # UI components + feature components
 │   ├── context/     # AuthContext, ThemeContext

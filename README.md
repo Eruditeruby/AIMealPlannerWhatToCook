@@ -16,7 +16,7 @@ A family-focused AI meal planner that suggests recipes based on available ingred
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 14 (App Router, TypeScript) + Tailwind CSS + Framer Motion |
+| Frontend | Next.js 15 (App Router, TypeScript) + Tailwind CSS + Framer Motion |
 | Backend | Node.js + Express 5 |
 | Database | MongoDB (Mongoose 9) |
 | Auth | Google OAuth via Passport.js + JWT (httpOnly cookie) |
@@ -39,7 +39,7 @@ AIMealPlannerWhatToCook/
 │   ├── utils/             # token.js
 │   ├── __tests__/         # 13 suites, 83 tests
 │   └── index.js           # Entry point
-├── client/                # Next.js 14 frontend
+├── client/                # Next.js 15 frontend
 │   └── src/
 │       ├── app/           # Pages (home, pantry, recipes, favorites)
 │       ├── components/    # UI + feature components
@@ -155,6 +155,20 @@ cd client && npm test -- --coverage    # 94% statements, 95% lines
 - [x] Phase 13: Landing page & layout
 - [ ] Phase 14: Integration testing
 - [ ] Phase 15: Polish & deployment
+
+## Deployment (Railway + Docker)
+
+Both services are containerized and ready for Railway deployment.
+
+### Quick Deploy
+
+1. Create a [Railway](https://railway.app) project
+2. Add MongoDB plugin ("New" → "Database" → "MongoDB")
+3. Add two services from GitHub, setting root directories to `server/` and `client/`
+4. Configure environment variables (see table above) on each service
+5. Set `GOOGLE_CALLBACK_URL` to `https://<server>.up.railway.app/api/auth/google/callback`
+6. Set `NEXT_PUBLIC_API_URL` to `https://<server>.up.railway.app/api`
+7. Update Google Cloud Console with the Railway callback URL
 
 ## License
 

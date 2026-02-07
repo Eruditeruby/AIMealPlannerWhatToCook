@@ -1,0 +1,8 @@
+node_modules
+.next
+.env
+.env.*
+__tests__
+src/__tests__
+coverage
+.DS_Store

@@ -46,14 +46,14 @@ describe('Layout', () => {
   });
 
   it('applies Inter font', () => {
-    const { container } = render(
+    render(
       <RootLayout>
         <div>Test Content</div>
       </RootLayout>
     );
 
-    const body = container.querySelector('body');
-    expect(body?.className).toContain('inter-font-class');
+    // React 19 hoists <body> to document.body
+    expect(document.body.className).toContain('inter-font-class');
   });
 
   it('renders children inside main', () => {
@@ -69,36 +69,33 @@ describe('Layout', () => {
   });
 
   it('applies background color class', () => {
-    const { container } = render(
+    render(
       <RootLayout>
         <div>Test</div>
       </RootLayout>
     );
 
-    const body = container.querySelector('body');
-    expect(body?.className).toContain('bg-[var(--background)]');
+    expect(document.body.className).toContain('bg-[var(--background)]');
   });
 
   it('applies antialiased class', () => {
-    const { container } = render(
+    render(
       <RootLayout>
         <div>Test</div>
       </RootLayout>
     );
 
-    const body = container.querySelector('body');
-    expect(body?.className).toContain('antialiased');
+    expect(document.body.className).toContain('antialiased');
   });
 
   it('applies min-h-screen class', () => {
-    const { container } = render(
+    render(
       <RootLayout>
         <div>Test</div>
       </RootLayout>
     );
 
-    const body = container.querySelector('body');
-    expect(body?.className).toContain('min-h-screen');
+    expect(document.body.className).toContain('min-h-screen');
   });
 
   it('main has max-width container', () => {
@@ -126,25 +123,24 @@ describe('Layout', () => {
   });
 
   it('html has lang attribute', () => {
-    const { container } = render(
+    render(
       <RootLayout>
         <div>Test</div>
       </RootLayout>
     );
 
-    const html = container.querySelector('html');
-    expect(html).toHaveAttribute('lang', 'en');
+    // React 19 hoists <html> to document.documentElement
+    expect(document.documentElement).toHaveAttribute('lang', 'en');
   });
 
   it('html element exists', () => {
-    const { container } = render(
+    render(
       <RootLayout>
         <div>Test</div>
       </RootLayout>
     );
 
-    const html = container.querySelector('html');
-    expect(html).toBeInTheDocument();
+    expect(document.documentElement).toBeInTheDocument();
   });
 
   it('renders multiple children', () => {
@@ -160,21 +156,20 @@ describe('Layout', () => {
   });
 
   it('maintains layout structure', () => {
-    const { container } = render(
+    render(
       <RootLayout>
         <div>Content</div>
       </RootLayout>
     );
 
-    // Check structure: html > body > Providers > (Navbar + main)
-    const html = container.querySelector('html');
-    const body = html?.querySelector('body');
-    const providers = body?.querySelector('[data-testid="providers"]');
+    // React 19 hoists html/body to document level
+    expect(document.documentElement).toBeInTheDocument();
+    expect(document.body).toBeInTheDocument();
+
+    const providers = document.body.querySelector('[data-testid="providers"]');
     const navbar = providers?.querySelector('[data-testid="navbar"]');
     const main = providers?.querySelector('main');
 
-    expect(html).toBeInTheDocument();
-    expect(body).toBeInTheDocument();
     expect(providers).toBeInTheDocument();
     expect(navbar).toBeInTheDocument();
     expect(main).toBeInTheDocument();
