@@ -4,8 +4,14 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const { configurePassport } = require('./config/passport');
 
 const app = express();
+
+// Initialize Passport Google strategy (skip if credentials missing, e.g. in tests)
+if (process.env.GOOGLE_CLIENT_ID) {
+  configurePassport();
+}
 
 // Trust proxy (Railway, Render, etc. run behind reverse proxies)
 app.set('trust proxy', 1);
