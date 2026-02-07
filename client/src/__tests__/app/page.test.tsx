@@ -1,5 +1,4 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Home from '@/app/page';
 import { AuthProvider } from '@/context/AuthContext';
@@ -183,8 +182,6 @@ describe('Home page', () => {
 
   it('Get Started button triggers login', async () => {
     (api.get as jest.Mock).mockRejectedValue(new Error('Not authenticated'));
-    const user = userEvent.setup();
-
     render(
       <AuthProvider>
         <Home />

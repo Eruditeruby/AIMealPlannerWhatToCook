@@ -121,7 +121,6 @@ describe('AuthContext', () => {
 
   it('login redirects to Google auth', async () => {
     (api.get as jest.Mock).mockRejectedValue(new Error('Not authenticated'));
-    const user = userEvent.setup();
 
     render(
       <AuthProvider>

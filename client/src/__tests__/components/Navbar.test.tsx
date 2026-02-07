@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Navbar from '@/components/Navbar';
 import { AuthProvider } from '@/context/AuthContext';
@@ -9,7 +8,9 @@ import api from '@/lib/api';
 // Mock dependencies
 jest.mock('@/lib/api');
 jest.mock('next/link', () => {
-  return ({ children, href }: any) => <a href={href}>{children}</a>;
+  const MockLink = ({ children, href }: any) => <a href={href}>{children}</a>;
+  MockLink.displayName = 'MockLink';
+  return MockLink;
 });
 jest.mock('framer-motion', () => ({
   motion: {

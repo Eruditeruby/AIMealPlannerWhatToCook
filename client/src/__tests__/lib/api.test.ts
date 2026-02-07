@@ -129,6 +129,7 @@ describe('API client', () => {
 
     // Re-require the module to pick up the new env var
     jest.resetModules();
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const apiWithCustomUrl = require('@/lib/api').default;
 
     (global.fetch as jest.Mock).mockResolvedValueOnce({

@@ -1,5 +1,4 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import FavoritesPage from '@/app/favorites/page';
 import { AuthProvider } from '@/context/AuthContext';
