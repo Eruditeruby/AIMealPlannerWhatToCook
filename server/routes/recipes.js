@@ -54,7 +54,10 @@ router.get('/saved', authMiddleware, async (req, res) => {
 router.post('/saved', authMiddleware, async (req, res) => {
   try {
     const { title, source, ingredients } = req.body;
+    console.log('[POST /saved] user:', req.user?.userId);
+    console.log('[POST /saved] body:', JSON.stringify(req.body).slice(0, 500));
     if (!title || !source || !ingredients) {
+      console.log('[POST /saved] Missing fields - title:', !!title, 'source:', !!source, 'ingredients:', !!ingredients);
       return res.status(400).json({ error: 'title, source, and ingredients are required' });
     }
 
@@ -62,8 +65,10 @@ router.post('/saved', authMiddleware, async (req, res) => {
       userId: req.user.userId,
       ...req.body,
     });
+    console.log('[POST /saved] Created recipe:', recipe._id);
     res.status(201).json(recipe);
   } catch (err) {
+    console.error('[POST /saved] ERROR:', err.message, err.stack);
     res.status(500).json({ error: 'Server error' });
   }
 });

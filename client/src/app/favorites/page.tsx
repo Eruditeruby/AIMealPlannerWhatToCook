@@ -27,21 +27,25 @@ export default function FavoritesPage() {
 
   const fetchFavorites = async () => {
     try {
+      console.log('[Favorites] Fetching saved recipes...');
       const data = await api.get('/recipes/saved');
+      console.log('[Favorites] Got', data?.length, 'saved recipes');
       setRecipes(data);
-    } catch {
-      // ignore
+    } catch (err: any) {
+      console.error('[Favorites] Fetch error:', err.message, err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleUnsave = async (recipe: any) => {
+    console.log('[Favorites] Unsaving recipe:', recipe._id, recipe.title);
     try {
       await api.delete(`/recipes/saved/${recipe._id}`);
+      console.log('[Favorites] Unsave success');
       setRecipes((prev) => prev.filter((r) => r._id !== recipe._id));
-    } catch {
-      // ignore
+    } catch (err: any) {
+      console.error('[Favorites] Unsave error:', err.message, err);
     }
   };
 

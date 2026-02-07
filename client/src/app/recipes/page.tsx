@@ -47,21 +47,25 @@ function RecipesContent() {
   };
 
   const handleSave = async (recipe: any) => {
+    const payload = {
+      title: recipe.title,
+      image: recipe.image,
+      source: recipe.source || 'spoonacular',
+      sourceId: recipe.id?.toString() || recipe.sourceId,
+      instructions: recipe.instructions || '',
+      ingredients: recipe.ingredients || recipe.usedIngredients || [],
+      cookTime: recipe.cookTime || null,
+      servings: recipe.servings || null,
+      tags: recipe.tags || [],
+      nutrition: recipe.nutrition || {},
+    };
+    console.log('[Save] Saving recipe:', recipe.title);
+    console.log('[Save] Payload:', JSON.stringify(payload).slice(0, 500));
     try {
-      await api.post('/recipes/saved', {
-        title: recipe.title,
-        image: recipe.image,
-        source: recipe.source || 'spoonacular',
-        sourceId: recipe.id?.toString() || recipe.sourceId,
-        instructions: recipe.instructions || '',
-        ingredients: recipe.ingredients || recipe.usedIngredients || [],
-        cookTime: recipe.cookTime || null,
-        servings: recipe.servings || null,
-        tags: recipe.tags || [],
-        nutrition: recipe.nutrition || {},
-      });
-    } catch {
-      // ignore
+      const result = await api.post('/recipes/saved', payload);
+      console.log('[Save] Success:', result);
+    } catch (err: any) {
+      console.error('[Save] Error:', err.message, err);
     }
   };
 
