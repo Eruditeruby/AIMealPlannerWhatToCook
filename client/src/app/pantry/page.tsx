@@ -74,7 +74,7 @@ export default function PantryPage() {
     >
       <h1 className="text-2xl font-bold mb-6">My Pantry</h1>
 
-      <IngredientInput onAdd={handleAdd} />
+      <IngredientInput onAdd={handleAdd} existingItems={items} />
 
       <div className="mt-6">
         <PantryList items={items} onRemove={handleRemove} />
