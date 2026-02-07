@@ -4,12 +4,21 @@ const findByIngredients = async (ingredients) => {
   if (!ingredients || ingredients.length === 0) return [];
 
   try {
-    const url = `${BASE_URL}/findByIngredients?ingredients=${ingredients.join(',')}&number=10&ranking=1&apiKey=${process.env.SPOONACULAR_API_KEY}`;
+    const apiKey = process.env.SPOONACULAR_API_KEY;
+    console.log('[Spoonacular] API key present:', !!apiKey, 'length:', apiKey?.length);
+    const url = `${BASE_URL}/findByIngredients?ingredients=${ingredients.join(',')}&number=10&ranking=1&apiKey=${apiKey}`;
+    console.log('[Spoonacular] Request URL (no key):', url.replace(apiKey || '', '***'));
     const res = await fetch(url, { method: 'GET' });
+    console.log('[Spoonacular] Response status:', res.status, res.statusText);
 
-    if (!res.ok) return [];
+    if (!res.ok) {
+      const errorBody = await res.text();
+      console.error('[Spoonacular] Error body:', errorBody.slice(0, 300));
+      return [];
+    }
 
     const data = await res.json();
+    console.log('[Spoonacular] Results count:', data.length);
     return data.map((recipe) => ({
       id: recipe.id,
       title: recipe.title,

@@ -33,9 +33,13 @@ function RecipesContent() {
     try {
       setLoading(true);
       setError('');
+      console.log('[Recipes] Fetching recipes for ingredients:', ingredients);
       const data = await api.get(`/recipes/suggest?ingredients=${ingredients}`);
+      console.log('[Recipes] Response:', JSON.stringify(data).slice(0, 500));
+      console.log('[Recipes] Recipe count:', data.recipes?.length ?? 'no recipes key');
       setRecipes(data.recipes || []);
     } catch (err: any) {
+      console.error('[Recipes] Fetch error:', err.message, err);
       setError(err.message || 'Failed to fetch recipes');
     } finally {
       setLoading(false);

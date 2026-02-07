@@ -11,23 +11,31 @@ const MIN_SPOONACULAR_RESULTS = 3;
 router.get('/suggest', authMiddleware, async (req, res) => {
   try {
     const { ingredients } = req.query;
+    console.log('[/suggest] ingredients query:', ingredients);
+    console.log('[/suggest] user:', req.user?.userId);
     if (!ingredients) {
       return res.status(400).json({ error: 'ingredients query param required' });
     }
 
     const ingredientList = ingredients.split(',').map((i) => i.trim()).filter(Boolean);
+    console.log('[/suggest] ingredientList:', ingredientList);
 
     let spoonResults = await spoonacular.findByIngredients(ingredientList);
+    console.log('[/suggest] spoonacular results:', spoonResults.length);
     spoonResults = spoonResults.map((r) => ({ ...r, source: 'spoonacular' }));
 
     let aiResults = [];
     if (spoonResults.length < MIN_SPOONACULAR_RESULTS) {
+      console.log('[/suggest] spoonacular < 3, calling OpenRouter...');
       aiResults = await openrouter.suggestRecipes(ingredientList);
+      console.log('[/suggest] OpenRouter results:', aiResults.length);
     }
 
     const recipes = [...spoonResults, ...aiResults];
+    console.log('[/suggest] total recipes:', recipes.length);
     res.json({ recipes });
   } catch (err) {
+    console.error('[/suggest] ERROR:', err.message, err.stack);
     res.status(500).json({ error: 'Server error' });
   }
 });

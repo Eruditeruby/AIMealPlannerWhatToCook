@@ -26,24 +26,33 @@ const suggestRecipes = async (ingredients) => {
   if (!ingredients || ingredients.length === 0) return [];
 
   try {
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    console.log('[OpenRouter] API key present:', !!apiKey, 'length:', apiKey?.length);
     const res = await fetch(OPENROUTER_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: 'meta-llama/llama-3.1-8b-instruct:free',
         messages: [{ role: 'user', content: buildPrompt(ingredients) }],
       }),
     });
+    console.log('[OpenRouter] Response status:', res.status, res.statusText);
 
-    if (!res.ok) return [];
+    if (!res.ok) {
+      const errorBody = await res.text();
+      console.error('[OpenRouter] Error body:', errorBody.slice(0, 500));
+      return [];
+    }
 
     const data = await res.json();
     const content = data.choices?.[0]?.message?.content;
+    console.log('[OpenRouter] Raw content (first 300):', content?.slice(0, 300));
 
     const parsed = JSON.parse(content);
+    console.log('[OpenRouter] Parsed recipes count:', parsed.recipes?.length);
     return (parsed.recipes || []).map((recipe) => ({
       ...recipe,
       source: 'ai',
