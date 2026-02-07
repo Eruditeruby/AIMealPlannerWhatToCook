@@ -17,15 +17,34 @@ router.get('/google', (req, res, next) => {
 // Google OAuth callback
 router.get(
   '/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: '/auth?error=true' }),
+  (req, res, next) => {
+    console.log('[Auth] Google callback received');
+    console.log('[Auth] Query params:', JSON.stringify(req.query));
+    passport.authenticate('google', { session: false }, (err, user, info) => {
+      if (err) {
+        console.error('[Auth] Passport error:', err.message);
+        return res.redirect((process.env.CLIENT_URL || 'http://localhost:3000') + '?error=auth_error');
+      }
+      if (!user) {
+        console.error('[Auth] No user returned. Info:', JSON.stringify(info));
+        return res.redirect((process.env.CLIENT_URL || 'http://localhost:3000') + '?error=no_user');
+      }
+      console.log('[Auth] User authenticated:', user.email);
+      req.user = user;
+      next();
+    })(req, res, next);
+  },
   (req, res) => {
     const token = generateToken(req.user);
-    res.cookie('token', token, {
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    };
+    console.log('[Auth] Setting cookie. Secure:', cookieOptions.secure, 'SameSite:', cookieOptions.sameSite);
+    console.log('[Auth] Redirecting to:', process.env.CLIENT_URL || 'http://localhost:3000');
+    res.cookie('token', token, cookieOptions);
     res.redirect(process.env.CLIENT_URL || 'http://localhost:3000');
   }
 );
@@ -33,10 +52,13 @@ router.get(
 // Get current user
 router.get('/me', authMiddleware, async (req, res) => {
   try {
+    console.log('[Auth] /me called, userId:', req.user.userId);
     const user = await User.findById(req.user.userId);
     if (!user) {
+      console.log('[Auth] /me user not found for id:', req.user.userId);
       return res.status(404).json({ error: 'User not found' });
     }
+    console.log('[Auth] /me returning user:', user.email);
     res.json({
       id: user._id,
       email: user.email,
@@ -45,12 +67,14 @@ router.get('/me', authMiddleware, async (req, res) => {
       preferences: user.preferences,
     });
   } catch (err) {
+    console.error('[Auth] /me error:', err.message);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
 // Logout
 router.post('/logout', (req, res) => {
+  console.log('[Auth] Logout');
   res.cookie('token', '', { httpOnly: true, expires: new Date(0) });
   res.json({ message: 'Logged out' });
 });
