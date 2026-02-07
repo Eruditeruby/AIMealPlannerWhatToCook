@@ -1,0 +1,282 @@
+{
+  "project": {
+    "name": "AI Meal Planner (What To Cook)",
+    "status": "Backend & Frontend Complete — Integration Testing Pending",
+    "generated": "2026-02-07",
+    "version": "1.0.0"
+  },
+  "metrics": {
+    "tests": {
+      "total": 279,
+      "server": 86,
+      "client": 193,
+      "suites": 31,
+      "passing": "100%"
+    },
+    "coverage": {
+      "server": {
+        "statements": "83%",
+        "branches": "80%",
+        "functions": "83%",
+        "lines": "82%"
+      },
+      "client": {
+        "statements": "94%",
+        "branches": "94%",
+        "functions": "87%",
+        "lines": "95%"
+      }
+    },
+    "linesOfCode": "~6500"
+  },
+  "entryPoints": {
+    "server": {
+      "path": "server/index.js",
+      "type": "Express 5 API",
+      "port": 5000
+    },
+    "client": {
+      "path": "client/src/app/layout.tsx",
+      "type": "Next.js 15 Root Layout",
+      "port": 3000
+    },
+    "tests": {
+      "server": "server/__tests__/",
+      "client": "client/src/__tests__/"
+    }
+  },
+  "structure": {
+    "server": {
+      "config": ["db.js", "passport.js"],
+      "middleware": ["auth.js"],
+      "models": ["User.js", "Pantry.js", "SavedRecipe.js"],
+      "routes": ["auth.js", "pantry.js", "recipes.js"],
+      "services": ["spoonacular.js", "openrouter.js"],
+      "utils": ["token.js", "debug.js"],
+      "tests": "__tests__/"
+    },
+    "client": {
+      "app": ["layout.tsx", "page.tsx", "pantry/", "recipes/", "favorites/"],
+      "components": ["Navbar.tsx", "ThemeToggle.tsx", "IngredientInput.tsx", "PantryList.tsx", "RecipeCard.tsx", "RecipeDetail.tsx"],
+      "componentsUI": ["Button.tsx", "Card.tsx", "Input.tsx"],
+      "context": ["AuthContext.tsx", "ThemeContext.tsx"],
+      "lib": ["api.ts", "debug.ts"],
+      "data": ["ingredients.ts"],
+      "tests": "__tests__/"
+    }
+  },
+  "techStack": {
+    "server": {
+      "runtime": "Node.js",
+      "framework": "Express 5",
+      "database": "MongoDB",
+      "odm": "Mongoose 9",
+      "auth": ["Passport.js", "Google OAuth", "JWT"],
+      "testing": ["Jest 30", "Supertest", "MongoDB Memory Server"],
+      "security": ["Helmet", "CORS", "Rate Limiting"]
+    },
+    "client": {
+      "framework": "Next.js 15",
+      "ui": "React 19",
+      "styling": "Tailwind CSS",
+      "animation": "Framer Motion",
+      "icons": "Lucide React",
+      "language": "TypeScript 5",
+      "testing": ["Jest 30", "Testing Library", "jsdom"]
+    },
+    "external": {
+      "recipes": "Spoonacular API",
+      "ai": "OpenRouter API",
+      "deployment": "Railway + Docker"
+    }
+  },
+  "dependencies": {
+    "server": {
+      "express": "^5.2.1",
+      "mongoose": "^9.1.6",
+      "passport": "^0.7.0",
+      "passport-google-oauth20": "^2.0.0",
+      "jsonwebtoken": "^9.0.3",
+      "cors": "^2.8.6",
+      "helmet": "^8.1.0",
+      "express-rate-limit": "^8.2.1",
+      "dotenv": "^17.2.4",
+      "cookie-parser": "^1.4.7"
+    },
+    "client": {
+      "next": "15.5.12",
+      "react": "^19",
+      "react-dom": "^19",
+      "framer-motion": "^12.33.0",
+      "lucide-react": "^0.563.0",
+      "tailwindcss": "^3.4.1",
+      "typescript": "^5"
+    }
+  },
+  "api": {
+    "baseUrl": "/api",
+    "endpoints": [
+      {
+        "method": "GET",
+        "path": "/health",
+        "auth": false,
+        "description": "Health check"
+      },
+      {
+        "method": "GET",
+        "path": "/auth/google",
+        "auth": false,
+        "description": "Initiate Google OAuth"
+      },
+      {
+        "method": "GET",
+        "path": "/auth/google/callback",
+        "auth": false,
+        "description": "OAuth callback"
+      },
+      {
+        "method": "GET",
+        "path": "/auth/me",
+        "auth": true,
+        "description": "Get current user"
+      },
+      {
+        "method": "POST",
+        "path": "/auth/logout",
+        "auth": true,
+        "description": "Logout (clear cookie)"
+      },
+      {
+        "method": "GET",
+        "path": "/pantry",
+        "auth": true,
+        "description": "Get pantry items"
+      },
+      {
+        "method": "PUT",
+        "path": "/pantry",
+        "auth": true,
+        "description": "Update pantry items"
+      },
+      {
+        "method": "GET",
+        "path": "/recipes/suggest",
+        "auth": true,
+        "description": "Get recipe suggestions"
+      },
+      {
+        "method": "GET",
+        "path": "/recipes/:id",
+        "auth": true,
+        "description": "Get recipe details"
+      },
+      {
+        "method": "GET",
+        "path": "/recipes/saved",
+        "auth": true,
+        "description": "Get saved recipes"
+      },
+      {
+        "method": "POST",
+        "path": "/recipes/saved",
+        "auth": true,
+        "description": "Save a recipe"
+      },
+      {
+        "method": "DELETE",
+        "path": "/recipes/saved/:id",
+        "auth": true,
+        "description": "Remove saved recipe"
+      }
+    ]
+  },
+  "documentation": {
+    "README.md": "Setup, features, API reference, testing",
+    "design.md": "Architecture, tech stack, design decisions",
+    "workflow.md": "TDD methodology, 15-phase implementation plan",
+    "CLAUDE.md": "Project instructions for Claude Code",
+    "DEPLOYMENT.md": "Railway deployment guide",
+    "PROJECT_INDEX.md": "Session bootstrapping index",
+    "LICENSE": "MIT License"
+  },
+  "workflow": {
+    "methodology": "TDD",
+    "phases": 15,
+    "completed": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+    "remaining": [14, 15],
+    "completedPhases": [
+      "Scaffolding & test infrastructure",
+      "Database models (User, Pantry, SavedRecipe)",
+      "Auth middleware & JWT",
+      "Auth routes (Google OAuth)",
+      "Pantry routes",
+      "External service clients",
+      "Recipe routes",
+      "Server integration",
+      "Theme system",
+      "Auth system (client)",
+      "UI components",
+      "Pantry feature (client)",
+      "Recipe feature (client)",
+      "Landing page & layout"
+    ],
+    "remainingPhases": [
+      "Integration testing",
+      "Polish & deployment"
+    ]
+  },
+  "security": {
+    "features": [
+      "JWT tokens in httpOnly cookies (XSS protection)",
+      "Helmet security headers",
+      "CORS configured",
+      "Rate limiting on API",
+      "MongoDB NoSQL injection prevention",
+      "Input validation on models",
+      "OAuth only (no passwords)"
+    ]
+  },
+  "knownIssues": {
+    "testPatterns": [
+      "MongoDB unique index tests need `await Model.ensureIndexes()` before duplicate test",
+      "Mongoose connection timeout test needs `serverSelectionTimeoutMS: 1000` option",
+      "Client tests mock `framer-motion` with passthrough divs/buttons",
+      "Client tests mock `next/navigation` (useRouter, useSearchParams, useParams)",
+      "jsdom doesn't support `window.location.href` assignment",
+      "`type=\"password\"` inputs don't have role `textbox`",
+      "React 19 hoists `<html>`/`<body>` to document level"
+    ],
+    "expressCompatibility": [
+      "`express-mongo-sanitize` and `hpp` incompatible with Express 5 (req.query read-only)",
+      "Solution: Custom body sanitizer for NoSQL injection prevention"
+    ],
+    "gitHooks": [
+      "Pre-commit hook blocks commands containing `.env`"
+    ]
+  },
+  "quickStart": {
+    "setup": [
+      "cp .env.example .env",
+      "Edit .env with actual credentials"
+    ],
+    "server": [
+      "cd server",
+      "npm install",
+      "npm run dev (port 5000)",
+      "npm test (86 tests)"
+    ],
+    "client": [
+      "cd client",
+      "npm install",
+      "npm run dev (port 3000)",
+      "npm test (193 tests)"
+    ]
+  },
+  "tokenEfficiency": {
+    "indexSize": "~3KB",
+    "fullCodebaseSize": "~58KB",
+    "reduction": "94%",
+    "breakEven": "1 session",
+    "savings100Sessions": "5,500,000 tokens"
+  }
+}
