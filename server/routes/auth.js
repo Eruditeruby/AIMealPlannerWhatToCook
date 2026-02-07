@@ -6,7 +6,13 @@ const { generateToken } = require('../utils/token');
 const User = require('../models/User');
 
 // Initiate Google OAuth
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', (req, res, next) => {
+  console.log('[Auth] Google OAuth initiated');
+  console.log('[Auth] GOOGLE_CLIENT_ID set:', !!process.env.GOOGLE_CLIENT_ID);
+  console.log('[Auth] GOOGLE_CLIENT_SECRET set:', !!process.env.GOOGLE_CLIENT_SECRET);
+  console.log('[Auth] GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL);
+  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
 
 // Google OAuth callback
 router.get(
