@@ -7,6 +7,9 @@ require('dotenv').config();
 
 const app = express();
 
+// Trust proxy (Railway, Render, etc. run behind reverse proxies)
+app.set('trust proxy', 1);
+
 // Security headers
 app.use(helmet());
 
