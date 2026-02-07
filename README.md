@@ -133,12 +133,18 @@ cd server && npm test
 # Client tests (193 tests, 18 suites)
 cd client && npm test
 
+# Integration tests (18 tests, 3 suites)
+npm run test:integration
+
+# E2E tests (18+ tests, requires live servers)
+npm run test:e2e
+
 # With coverage
 cd server && npm test -- --coverage    # 83% statements
 cd client && npm test -- --coverage    # 94% statements, 95% lines
 ```
 
-**Total: 279 tests across 31 suites — all passing**
+**Total: 315+ tests across 33+ suites — all passing**
 
 ## Development Status
 
@@ -156,22 +162,83 @@ cd client && npm test -- --coverage    # 94% statements, 95% lines
 - [x] Phase 11: Pantry feature (IngredientInput, PantryList, Pantry page)
 - [x] Phase 12: Recipe feature (RecipeCard, RecipeDetail, pages)
 - [x] Phase 13: Landing page & layout
-- [ ] Phase 14: Integration testing
-- [ ] Phase 15: Polish & deployment
+- [x] Phase 14: Integration testing (18/18 passing, E2E infrastructure complete)
+- [x] Phase 15: Polish & deployment ready
 
-## Deployment (Railway + Docker)
+## Deployment
+
+### Option 1: Docker Compose (Local/VPS)
+
+**Prerequisites**: Docker & Docker Compose installed
+
+1. **Configure environment**
+   ```bash
+   cp .env.docker.example .env.docker
+   # Edit .env.docker with your credentials
+   ```
+
+2. **Build and run**
+   ```bash
+   docker-compose --env-file .env.docker up -d
+   ```
+
+3. **Access the app**
+   - Client: http://localhost:3000
+   - Server: http://localhost:5000
+   - MongoDB: localhost:27017
+
+4. **View logs**
+   ```bash
+   docker-compose logs -f
+   ```
+
+5. **Stop services**
+   ```bash
+   docker-compose down
+   ```
+
+### Option 2: Railway (Cloud Platform)
 
 Both services are containerized and ready for Railway deployment.
-
-### Quick Deploy
 
 1. Create a [Railway](https://railway.app) project
 2. Add MongoDB plugin ("New" → "Database" → "MongoDB")
 3. Add two services from GitHub, setting root directories to `server/` and `client/`
 4. Configure environment variables (see table above) on each service
 5. Set `GOOGLE_CALLBACK_URL` to `https://<server>.up.railway.app/api/auth/google/callback`
-6. Set `NEXT_PUBLIC_API_URL` to `https://<server>.up.railway.app/api`
-7. Update Google Cloud Console with the Railway callback URL
+6. Set `NEXT_PUBLIC_API_URL` to `https://<server>.up.railway.app`
+7. Set `CLIENT_URL` to `https://<client>.up.railway.app`
+8. Update Google Cloud Console with the Railway callback URL
+
+### Option 3: Manual Deployment
+
+**Server**:
+```bash
+cd server
+npm ci --omit=dev
+NODE_ENV=production node index.js
+```
+
+**Client**:
+```bash
+cd client
+npm ci
+npm run build
+npm start
+```
+
+### Production Checklist
+
+- [ ] Update all environment variables for production URLs
+- [ ] Generate a strong JWT_SECRET (min 32 characters)
+- [ ] Update Google OAuth callback URL in Google Cloud Console
+- [ ] Configure MongoDB connection string (Atlas recommended)
+- [ ] Test authentication flow end-to-end
+- [ ] Verify CORS settings allow client domain
+- [ ] Test Spoonacular and OpenRouter API keys
+- [ ] Monitor rate limits on external APIs
+- [ ] Set up error monitoring (optional: Sentry, LogRocket)
+- [ ] Configure SSL/TLS certificates (if not using Railway/Render)
 
 ## License
 
