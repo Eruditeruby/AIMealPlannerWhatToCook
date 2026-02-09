@@ -112,7 +112,7 @@ cd client && npm run dev           # Dev server (Next.js)
 - [x] Positioning Phase 4: Savings tracker & cooking log
 - [x] Positioning Phase 5: Content, SEO & social sharing
 
-**Total: 381 tests across 41 suites — all passing**
+**Total: 382 tests across 41 suites — all passing**
 
 ## Conventions
 
