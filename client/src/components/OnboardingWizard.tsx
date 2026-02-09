@@ -67,7 +67,7 @@ export default function OnboardingWizard({ onComplete, onSkip }: OnboardingWizar
   const isFirstStep = currentStep === 0;
 
   const handleSelect = (value: string) => {
-    if (step.multiSelect) {
+    if ('multiSelect' in step && step.multiSelect) {
       const current = (selections[step.key] as string[]) || [];
       const updated = current.includes(value)
         ? current.filter((v) => v !== value)

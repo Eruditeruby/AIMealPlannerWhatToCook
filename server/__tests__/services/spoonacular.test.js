@@ -40,7 +40,7 @@ describe('Spoonacular Client', () => {
         ],
       });
 
-      const results = await spoonacular.findByIngredients(['chicken', 'rice']);
+      const results = await spoonacular.findByIngredients(['beef', 'broccoli']);
       expect(results).toHaveLength(1);
       expect(results[0]).toEqual(
         expect.objectContaining({
@@ -52,13 +52,13 @@ describe('Spoonacular Client', () => {
     });
 
     test('handles API error gracefully', async () => {
-      global.fetch.mockResolvedValueOnce({ ok: false, status: 500 });
+      global.fetch.mockResolvedValueOnce({ ok: false, status: 500, text: async () => 'Server Error' });
       const results = await spoonacular.findByIngredients(['chicken']);
       expect(results).toEqual([]);
     });
 
     test('handles rate limit (402) gracefully', async () => {
-      global.fetch.mockResolvedValueOnce({ ok: false, status: 402 });
+      global.fetch.mockResolvedValueOnce({ ok: false, status: 402, text: async () => 'Payment Required' });
       const results = await spoonacular.findByIngredients(['chicken']);
       expect(results).toEqual([]);
     });
