@@ -14,6 +14,12 @@ export const metadata: Metadata = {
     title: "What To Cook — Save Money by Cooking What You Have",
     description: "Stop wasting $2,000/year in groceries. Get AI-powered meal suggestions from ingredients you already have.",
     type: "website",
+    siteName: "What To Cook",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "What To Cook — Save Money by Cooking What You Have",
+    description: "AI-powered meal suggestions from your pantry. Reduce food waste and save money.",
   },
 };
 
