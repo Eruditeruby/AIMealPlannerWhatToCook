@@ -27,6 +27,25 @@ const userSchema = new mongoose.Schema({
       type: Number,
       default: null,
     },
+    budgetGoal: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'medium',
+    },
+    cookingSkill: {
+      type: String,
+      enum: ['beginner', 'intermediate', 'advanced'],
+      default: 'intermediate',
+    },
+    householdType: {
+      type: String,
+      enum: ['single', 'couple', 'family-small', 'family-large'],
+      default: 'family-small',
+    },
+    onboardingComplete: {
+      type: Boolean,
+      default: false,
+    },
   },
   createdAt: {
     type: Date,

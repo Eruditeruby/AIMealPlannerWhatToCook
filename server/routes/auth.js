@@ -73,6 +73,66 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
+// Get user preferences
+router.get('/preferences', authMiddleware, async (req, res) => {
+  try {
+    debug('[Auth] GET /preferences, userId:', req.user.userId);
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ preferences: user.preferences });
+  } catch (err) {
+    debugError('[Auth] GET /preferences error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Update user preferences
+router.put('/preferences', authMiddleware, async (req, res) => {
+  try {
+    debug('[Auth] PUT /preferences, userId:', req.user.userId);
+    const allowedFields = [
+      'dietaryRestrictions',
+      'familySize',
+      'budgetGoal',
+      'cookingSkill',
+      'householdType',
+      'onboardingComplete',
+    ];
+
+    const updates = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        updates[`preferences.${field}`] = req.body[field];
+      }
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'No valid preference fields provided' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.userId,
+      { $set: updates },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    debug('[Auth] Preferences updated for:', user.email);
+    res.json({ preferences: user.preferences });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ error: err.message });
+    }
+    debugError('[Auth] PUT /preferences error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Logout
 router.post('/logout', (req, res) => {
   debug('[Auth] Logout');

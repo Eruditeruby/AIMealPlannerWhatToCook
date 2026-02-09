@@ -12,6 +12,10 @@ interface User {
   preferences: {
     dietaryRestrictions: string[];
     familySize: number | null;
+    budgetGoal: 'low' | 'medium' | 'high';
+    cookingSkill: 'beginner' | 'intermediate' | 'advanced';
+    householdType: 'single' | 'couple' | 'family-small' | 'family-large';
+    onboardingComplete: boolean;
   };
 }
 
@@ -21,6 +25,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: () => void;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -61,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, refreshUser: checkAuth }}>
       {children}
     </AuthContext.Provider>
   );
