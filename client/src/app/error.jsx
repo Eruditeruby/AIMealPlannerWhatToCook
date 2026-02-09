@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 export default function Error({ error, reset }) {
@@ -37,7 +38,7 @@ export default function Error({ error, reset }) {
         </h2>
 
         <p className="text-gray-600 dark:text-gray-400 mb-6">
-          We encountered an unexpected error. Don't worry, your data is safe.
+          We encountered an unexpected error. Don&apos;t worry, your data is safe.
         </p>
 
         {process.env.NODE_ENV === 'development' && (
@@ -55,12 +56,12 @@ export default function Error({ error, reset }) {
           >
             Try Again
           </button>
-          <a
+          <Link
             href="/"
             className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium py-2 px-4 rounded transition-colors inline-block"
           >
             Go Home
-          </a>
+          </Link>
         </div>
       </motion.div>
     </div>
