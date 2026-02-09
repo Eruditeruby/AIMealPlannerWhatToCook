@@ -6,15 +6,24 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import IngredientInput from '@/components/IngredientInput';
 import PantryList from '@/components/PantryList';
+import OnboardingWizard from '@/components/OnboardingWizard';
 import Button from '@/components/ui/Button';
 import { ChefHat, Refrigerator, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function PantryPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading, refreshUser } = useAuth();
   const router = useRouter();
   const [items, setItems] = useState<string[]>([]);
+  const [pantryItems, setPantryItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    if (user && !user.preferences?.onboardingComplete) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -32,6 +41,7 @@ export default function PantryPage() {
     try {
       const data = await api.get('/pantry');
       setItems(data.items || []);
+      setPantryItems(data.pantryItems || []);
     } catch {
       // ignore
     } finally {
@@ -71,6 +81,11 @@ export default function PantryPage() {
     );
   }
 
+  const handleOnboardingComplete = async () => {
+    setShowOnboarding(false);
+    await refreshUser();
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -78,6 +93,12 @@ export default function PantryPage() {
       transition={{ duration: 0.3 }}
       className="max-w-3xl mx-auto"
     >
+      {showOnboarding && (
+        <OnboardingWizard
+          onComplete={handleOnboardingComplete}
+          onSkip={handleOnboardingComplete}
+        />
+      )}
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <div className="p-2.5 bg-[var(--accent)]/10 rounded-xl">
@@ -111,7 +132,7 @@ export default function PantryPage() {
             </span>
           )}
         </div>
-        <PantryList items={items} onRemove={handleRemove} />
+        <PantryList items={items} pantryItems={pantryItems} onRemove={handleRemove} />
       </div>
 
       {/* Cook Button */}

@@ -19,6 +19,13 @@ jest.mock('lucide-react', () => ({
   Refrigerator: (props: any) => <span data-testid="fridge-icon" {...props} />,
   Sparkles: (props: any) => <span data-testid="sparkles-icon" {...props} />,
   ShoppingBasket: (props: any) => <span data-testid="basket-icon" {...props} />,
+  Users: (props: any) => <span data-testid="users-icon" {...props} />,
+  Wallet: (props: any) => <span data-testid="wallet-icon" {...props} />,
+  Leaf: (props: any) => <span data-testid="leaf-icon" {...props} />,
+  ChevronRight: (props: any) => <span data-testid="chevron-right" {...props} />,
+  ChevronLeft: (props: any) => <span data-testid="chevron-left" {...props} />,
+  Clock: (props: any) => <span data-testid="clock-icon" {...props} />,
+  AlertTriangle: (props: any) => <span data-testid="alert-icon" {...props} />,
 }));
 jest.mock('framer-motion', () => ({
   motion: {
@@ -38,6 +45,10 @@ const mockUser = {
   preferences: {
     dietaryRestrictions: [],
     familySize: null,
+    budgetGoal: 'medium' as const,
+    cookingSkill: 'intermediate' as const,
+    householdType: 'family-small' as const,
+    onboardingComplete: true,
   },
 };
 

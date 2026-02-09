@@ -5,6 +5,7 @@ const authMiddleware = require('../middleware/auth');
 const spoonacular = require('../services/spoonacular');
 const openrouter = require('../services/openrouter');
 const SavedRecipe = require('../models/SavedRecipe');
+const Pantry = require('../models/Pantry');
 
 const MIN_SPOONACULAR_RESULTS = 3;
 
@@ -21,14 +22,45 @@ router.get('/suggest', authMiddleware, async (req, res) => {
     const ingredientList = ingredients.split(',').map((i) => i.trim()).filter(Boolean);
     debug('[/suggest] ingredientList:', ingredientList);
 
-    let spoonResults = await spoonacular.findByIngredients(ingredientList);
+    // Prioritize perishable items by sorting them first
+    let sortedIngredients = ingredientList;
+    try {
+      const pantry = await Pantry.findOne({ userId: req.user.userId });
+      if (pantry && pantry.items.length > 0) {
+        const perishableSet = new Set();
+        const itemAgeMap = new Map();
+        for (const item of pantry.items) {
+          if (item.perishable) {
+            perishableSet.add(item.name);
+            itemAgeMap.set(item.name, item.addedAt);
+          }
+        }
+        sortedIngredients = [...ingredientList].sort((a, b) => {
+          const aPerish = perishableSet.has(a) ? 0 : 1;
+          const bPerish = perishableSet.has(b) ? 0 : 1;
+          if (aPerish !== bPerish) return aPerish - bPerish;
+          // Among perishable, oldest first
+          if (aPerish === 0 && bPerish === 0) {
+            const ageA = itemAgeMap.get(a) || new Date();
+            const ageB = itemAgeMap.get(b) || new Date();
+            return new Date(ageA).getTime() - new Date(ageB).getTime();
+          }
+          return 0;
+        });
+        debug('[/suggest] sortedIngredients (perishable first):', sortedIngredients);
+      }
+    } catch (err) {
+      debug('[/suggest] Could not load pantry for prioritization, using original order');
+    }
+
+    let spoonResults = await spoonacular.findByIngredients(sortedIngredients);
     debug('[/suggest] spoonacular results:', spoonResults.length);
     spoonResults = spoonResults.map((r) => ({ ...r, source: 'spoonacular' }));
 
     let aiResults = [];
     if (spoonResults.length < MIN_SPOONACULAR_RESULTS) {
       debug('[/suggest] spoonacular < 3, calling OpenRouter...');
-      aiResults = await openrouter.suggestRecipes(ingredientList);
+      aiResults = await openrouter.suggestRecipes(sortedIngredients);
       debug('[/suggest] OpenRouter results:', aiResults.length);
     }
 
