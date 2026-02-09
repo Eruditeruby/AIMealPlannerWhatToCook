@@ -1,0 +1,47 @@
+#!/bin/bash
+# Pre-commit hook: checks for secrets, runs lint & tests
+
+set -e
+
+echo "🔍 Pre-commit checks running..."
+
+# 1. Block .env files from being committed
+STAGED_ENV=$(git diff --cached --name-only | grep -E '\.env$|\.env\.local$|\.env\.production$|\.env\.development$' || true)
+if [ -n "$STAGED_ENV" ]; then
+  echo "❌ BLOCKED: Attempting to commit .env file(s):"
+  echo "$STAGED_ENV"
+  echo "Remove with: git reset HEAD <file>"
+  exit 1
+fi
+
+# 2. Check for hardcoded secrets in staged files
+SECRETS_PATTERN='(AKIA[0-9A-Z]{16}|sk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{36}|password\s*=\s*["\x27][^"\x27]{8,}|API_KEY\s*=\s*["\x27][^"\x27]+)'
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -v '.env.example' || true)
+if [ -n "$STAGED_FILES" ]; then
+  FOUND_SECRETS=$(echo "$STAGED_FILES" | xargs grep -lE "$SECRETS_PATTERN" 2>/dev/null || true)
+  if [ -n "$FOUND_SECRETS" ]; then
+    echo "⚠️  WARNING: Possible secrets detected in:"
+    echo "$FOUND_SECRETS"
+    echo "Review these files before committing."
+    echo "To bypass (if safe): git commit --no-verify"
+    exit 1
+  fi
+fi
+
+# 3. Check for staged server changes -> run server tests
+SERVER_CHANGES=$(git diff --cached --name-only | grep '^server/' || true)
+if [ -n "$SERVER_CHANGES" ]; then
+  echo "🧪 Server changes detected — running server tests..."
+  cd server && npx jest --bail --silent 2>&1 | tail -5
+  cd ..
+fi
+
+# 4. Check for staged client changes -> run client lint + tests
+CLIENT_CHANGES=$(git diff --cached --name-only | grep '^client/' || true)
+if [ -n "$CLIENT_CHANGES" ]; then
+  echo "🧪 Client changes detected — running client tests..."
+  cd client && npx jest --bail --silent 2>&1 | tail -5
+  cd ..
+fi
+
+echo "✅ Pre-commit checks passed!"

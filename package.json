@@ -13,6 +13,7 @@
     "test:all": "npm run test:server && npm run test:client && npm run test:integration",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
+    "prepare": "git config core.hooksPath .githooks",
     "install:all": "npm install && cd server && npm install && cd ../client && npm install",
     "playwright:install": "playwright install"
   },
