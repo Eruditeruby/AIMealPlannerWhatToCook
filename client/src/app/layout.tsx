@@ -7,8 +7,14 @@ import Navbar from "@/components/Navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "What To Cook - AI Meal Planner",
-  description: "Family-focused AI meal planner that suggests recipes based on your ingredients",
+  title: "What To Cook — Save Money by Cooking What You Already Have",
+  description: "Stop wasting groceries. AI-powered meal suggestions from your pantry ingredients. Reduce food waste, save money, and end the nightly dinner stress. Free for families.",
+  keywords: "what to cook with ingredients I have, reduce food waste app, family meal planner, budget cooking app, use up leftover ingredients",
+  openGraph: {
+    title: "What To Cook — Save Money by Cooking What You Have",
+    description: "Stop wasting $2,000/year in groceries. Get AI-powered meal suggestions from ingredients you already have.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

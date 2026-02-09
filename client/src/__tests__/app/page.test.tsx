@@ -15,6 +15,9 @@ jest.mock('lucide-react', () => ({
   ChefHat: (props: any) => <span data-testid="chef-hat-icon" {...props} />,
   Refrigerator: (props: any) => <span data-testid="refrigerator-icon" {...props} />,
   Heart: (props: any) => <span data-testid="heart-icon" {...props} />,
+  TrendingDown: (props: any) => <span data-testid="trending-down-icon" {...props} />,
+  Clock: (props: any) => <span data-testid="clock-icon" {...props} />,
+  DollarSign: (props: any) => <span data-testid="dollar-sign-icon" {...props} />,
 }));
 jest.mock('framer-motion', () => ({
   motion: {
@@ -73,12 +76,12 @@ describe('Home page', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Track Your Pantry')).toBeInTheDocument();
+      expect(screen.getByText('Your Kitchen, Tracked')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Track Your Pantry')).toBeInTheDocument();
-    expect(screen.getByText('AI Recipe Suggestions')).toBeInTheDocument();
-    expect(screen.getByText('Save Favorites')).toBeInTheDocument();
+    expect(screen.getByText('Your Kitchen, Tracked')).toBeInTheDocument();
+    expect(screen.getByText('Dinner in 10 Seconds')).toBeInTheDocument();
+    expect(screen.getByText('Never Waste Again')).toBeInTheDocument();
   });
 
   it('shows feature descriptions', async () => {
@@ -91,11 +94,11 @@ describe('Home page', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Add ingredients you have at home')).toBeInTheDocument();
+      expect(screen.getByText('Know exactly what you have and what needs using soon')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Get recipes based on what you have')).toBeInTheDocument();
-    expect(screen.getByText('Keep your best recipes for later')).toBeInTheDocument();
+    expect(screen.getByText('AI finds the best meals from your ingredients')).toBeInTheDocument();
+    expect(screen.getByText('Track savings and build your family recipe book')).toBeInTheDocument();
   });
 
   it('shows tagline', async () => {
@@ -108,8 +111,24 @@ describe('Home page', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Tell us what's in your kitchen/)).toBeInTheDocument();
+      expect(screen.getByText(/Stop wasting groceries/)).toBeInTheDocument();
     });
+  });
+
+  it('shows food waste statistics section', async () => {
+    (api.get as jest.Mock).mockRejectedValue(new Error('Not authenticated'));
+
+    render(
+      <AuthProvider>
+        <Home />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/\$2,000\/year in food/)).toBeInTheDocument();
+    });
+
+    expect(screen.getByText(/more money stays in your wallet/)).toBeInTheDocument();
   });
 
   it('renders ChefHat icon', async () => {
@@ -139,7 +158,8 @@ describe('Home page', () => {
       expect(screen.getByTestId('refrigerator-icon')).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId('heart-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('clock-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('dollar-sign-icon')).toBeInTheDocument();
   });
 
   it('redirects to /pantry if authenticated', async () => {

@@ -2,15 +2,15 @@
 
 ## Vision
 
-A family-focused AI meal planner that helps users figure out what to cook based on available ingredients, reduces food waste, and provides nutritional insights — powered by OpenRouter free models.
+Help busy families cook what they already have — saving money, reducing the $2,000/year the average household wastes in food, and ending the nightly "what's for dinner?" stress. Powered by AI recipe suggestions that prioritize your existing pantry ingredients.
 
 ## Target Users
 
-- **Families** — budget-aware, kid-friendly meals, batch cooking support
+- **Budget-conscious parents (30-49)** — families of 2-4 who want to reduce grocery waste, save money, and solve dinner quickly
 
 ## MVP Scope (Lean)
 
-Ingredient input → AI recipe suggestions, with Google auth and persistent pantry.
+Ingredient input → AI recipe suggestions, with Google auth and persistent pantry. Positioned around food waste reduction and family savings.
 
 ---
 

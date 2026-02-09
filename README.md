@@ -1,13 +1,14 @@
-# AI Meal Planner — What To Cook?
+# What To Cook? — Stop Wasting Groceries
 
-A family-focused AI meal planner that suggests recipes based on available ingredients, with persistent pantry tracking and nutritional insights.
+A meal planner for busy families that helps you cook what you already have — saving money, reducing food waste, and ending the nightly "what's for dinner?" stress. Powered by AI recipe suggestions from your pantry ingredients.
 
 ## Features
 
-- **Google OAuth** — Secure login with Google
+- **Cook What You Have** — AI-powered recipe suggestions from your pantry ingredients
+- **Reduce Food Waste** — Track what needs using soon so nothing goes to waste
 - **Pantry Management** — Track ingredients with autocomplete (~350 ingredients)
-- **Smart Recipe Suggestions** — Spoonacular API + OpenRouter AI fallback
-- **Save Favorites** — Bookmark recipes for later
+- **Save Favorites** — Build your family recipe book
+- **Google OAuth** — Secure login with Google
 - **Dark/Light Mode** — Smooth theme switching with CSS variables
 - **Responsive Design** — Mobile-first layout with Tailwind CSS
 - **Framer Motion** — Smooth page transitions and animations
