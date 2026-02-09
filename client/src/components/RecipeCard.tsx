@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Card from './ui/Card';
-import { Clock, Users, Heart } from 'lucide-react';
+import { Clock, Users, Heart, ChefHat } from 'lucide-react';
 
 interface Recipe {
   id?: number;
@@ -17,10 +17,11 @@ interface Recipe {
 interface RecipeCardProps {
   recipe: Recipe;
   onSave?: (recipe: Recipe) => void;
+  onCooked?: (recipe: Recipe) => void;
   isSaved?: boolean;
 }
 
-export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps) {
+export default function RecipeCard({ recipe, onSave, onCooked, isSaved }: RecipeCardProps) {
   const router = useRouter();
 
   const handleClick = () => {
@@ -68,15 +69,26 @@ export default function RecipeCard({ recipe, onSave, isSaved }: RecipeCardProps)
           {recipe.source === 'ai' ? 'AI' : 'Spoonacular'}
         </span>
 
-        {onSave && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onSave(recipe); }}
-            aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
-            className={`transition-colors ${isSaved ? 'text-red-500' : 'text-[var(--text-secondary)] hover:text-red-500'}`}
-          >
-            <Heart size={18} fill={isSaved ? 'currentColor' : 'none'} />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {onCooked && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onCooked(recipe); }}
+              aria-label="I cooked this"
+              className="text-xs px-2 py-1 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-colors flex items-center gap-1"
+            >
+              <ChefHat size={14} /> Cooked!
+            </button>
+          )}
+          {onSave && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onSave(recipe); }}
+              aria-label={isSaved ? 'Unsave recipe' : 'Save recipe'}
+              className={`transition-colors ${isSaved ? 'text-red-500' : 'text-[var(--text-secondary)] hover:text-red-500'}`}
+            >
+              <Heart size={18} fill={isSaved ? 'currentColor' : 'none'} />
+            </button>
+          )}
+        </div>
       </div>
     </Card>
   );

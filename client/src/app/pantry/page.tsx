@@ -7,6 +7,7 @@ import api from '@/lib/api';
 import IngredientInput from '@/components/IngredientInput';
 import PantryList from '@/components/PantryList';
 import OnboardingWizard from '@/components/OnboardingWizard';
+import SavingsDashboard from '@/components/SavingsDashboard';
 import Button from '@/components/ui/Button';
 import { ChefHat, Refrigerator, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -134,6 +135,9 @@ export default function PantryPage() {
         </div>
         <PantryList items={items} pantryItems={pantryItems} onRemove={handleRemove} />
       </div>
+
+      {/* Savings Dashboard */}
+      <SavingsDashboard />
 
       {/* Cook Button */}
       {items.length > 0 && (

@@ -19,6 +19,7 @@ jest.mock('lucide-react', () => ({
   Clock: (props: any) => <span data-testid="clock-icon" {...props} />,
   Users: (props: any) => <span data-testid="users-icon" {...props} />,
   Heart: ({ fill, ...props }: any) => <span data-testid="heart-icon" data-fill={fill} {...props} />,
+  ChefHat: (props: any) => <span data-testid="chef-icon" {...props} />,
 }));
 jest.mock('framer-motion', () => ({
   motion: {

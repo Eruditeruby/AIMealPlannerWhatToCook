@@ -13,6 +13,7 @@ jest.mock('lucide-react', () => ({
   Clock: (props: any) => <span data-testid="clock-icon" {...props} />,
   Users: (props: any) => <span data-testid="users-icon" {...props} />,
   Heart: ({ fill, ...props }: any) => <span data-testid="heart-icon" data-fill={fill} {...props} />,
+  ChefHat: (props: any) => <span data-testid="chef-icon" {...props} />,
 }));
 jest.mock('framer-motion', () => ({
   motion: {
@@ -146,5 +147,31 @@ describe('RecipeCard', () => {
     const classes = button.className.split(/\s+/);
     expect(classes).not.toContain('text-red-500');
     expect(button.className).toContain('text-[var(--text-secondary)]');
+  });
+
+  it('shows "Cooked!" button when onCooked provided', () => {
+    const onCooked = jest.fn();
+    render(<RecipeCard recipe={mockRecipe} onCooked={onCooked} />);
+    expect(screen.getByRole('button', { name: 'I cooked this' })).toBeInTheDocument();
+    expect(screen.getByText('Cooked!')).toBeInTheDocument();
+  });
+
+  it('calls onCooked when "Cooked!" button clicked', async () => {
+    const onCooked = jest.fn();
+    const user = userEvent.setup();
+    render(<RecipeCard recipe={mockRecipe} onCooked={onCooked} />);
+    await user.click(screen.getByRole('button', { name: 'I cooked this' }));
+    expect(onCooked).toHaveBeenCalledWith(mockRecipe);
+  });
+
+  it('does not show "Cooked!" button when onCooked not provided', () => {
+    render(<RecipeCard recipe={mockRecipe} />);
+    expect(screen.queryByRole('button', { name: 'I cooked this' })).not.toBeInTheDocument();
+  });
+
+  it('shows both save and cooked buttons together', () => {
+    render(<RecipeCard recipe={mockRecipe} onSave={jest.fn()} onCooked={jest.fn()} />);
+    expect(screen.getByRole('button', { name: 'Save recipe' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'I cooked this' })).toBeInTheDocument();
   });
 });

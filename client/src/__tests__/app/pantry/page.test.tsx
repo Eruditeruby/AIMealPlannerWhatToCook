@@ -26,6 +26,8 @@ jest.mock('lucide-react', () => ({
   ChevronLeft: (props: any) => <span data-testid="chevron-left" {...props} />,
   Clock: (props: any) => <span data-testid="clock-icon" {...props} />,
   AlertTriangle: (props: any) => <span data-testid="alert-icon" {...props} />,
+  DollarSign: (props: any) => <span data-testid="dollar-icon" {...props} />,
+  TrendingUp: (props: any) => <span data-testid="trending-icon" {...props} />,
 }));
 jest.mock('framer-motion', () => ({
   motion: {

@@ -67,6 +67,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authLimiter, require('./routes/auth'));
 app.use('/api/pantry', require('./routes/pantry'));
 app.use('/api/recipes', require('./routes/recipes'));
+app.use('/api/cooking', require('./routes/cooking'));
 
 // 404 handler
 app.use((req, res) => {

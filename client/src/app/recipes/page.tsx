@@ -67,6 +67,17 @@ function RecipesContent() {
     }
   };
 
+  const handleCooked = async (recipe: any) => {
+    try {
+      await api.post('/cooking/log', {
+        recipeTitle: recipe.title,
+        ingredientsUsed: recipe.ingredients || recipe.usedIngredients || [],
+      });
+    } catch {
+      // ignore
+    }
+  };
+
   const handleToggleSave = async (recipe: any) => {
     const key = getRecipeKey(recipe);
     const existingId = savedMap[key];
@@ -138,6 +149,7 @@ function RecipesContent() {
               <RecipeCard
                 recipe={recipe}
                 onSave={handleToggleSave}
+                onCooked={handleCooked}
                 isSaved={!!savedMap[getRecipeKey(recipe)]}
               />
             </motion.div>
