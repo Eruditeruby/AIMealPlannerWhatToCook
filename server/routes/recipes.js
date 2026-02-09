@@ -4,15 +4,17 @@ const { debug, debugError } = require('../utils/debug');
 const authMiddleware = require('../middleware/auth');
 const spoonacular = require('../services/spoonacular');
 const openrouter = require('../services/openrouter');
+const { mapDietaryRestrictions } = require('../utils/dietaryMapper');
 const SavedRecipe = require('../models/SavedRecipe');
 const Pantry = require('../models/Pantry');
+const User = require('../models/User');
 
 const MIN_SPOONACULAR_RESULTS = 3;
 
-// GET /api/recipes/suggest?ingredients=chicken,rice
+// GET /api/recipes/suggest?ingredients=chicken,rice&mealType=dinner&maxTime=30&cuisine=italian
 router.get('/suggest', authMiddleware, async (req, res) => {
   try {
-    const { ingredients } = req.query;
+    const { ingredients, mealType, maxTime, cuisine } = req.query;
     debug('[/suggest] ingredients query:', ingredients);
     debug('[/suggest] user:', req.user?.userId);
     if (!ingredients) {
@@ -21,6 +23,28 @@ router.get('/suggest', authMiddleware, async (req, res) => {
 
     const ingredientList = ingredients.split(',').map((i) => i.trim()).filter(Boolean);
     debug('[/suggest] ingredientList:', ingredientList);
+
+    // Load user preferences
+    let userPrefs = {};
+    try {
+      const fullUser = await User.findById(req.user.userId);
+      if (fullUser?.preferences) {
+        userPrefs = fullUser.preferences;
+      }
+    } catch (err) {
+      debug('[/suggest] Could not load user preferences');
+    }
+
+    // Map dietary restrictions to Spoonacular params
+    const { diet, intolerances } = mapDietaryRestrictions(userPrefs.dietaryRestrictions);
+
+    // Build search options combining user prefs + query filters
+    const searchOptions = {};
+    if (diet) searchOptions.diet = diet;
+    if (intolerances) searchOptions.intolerances = intolerances;
+    if (mealType) searchOptions.type = mealType;
+    if (maxTime) searchOptions.maxReadyTime = parseInt(maxTime, 10);
+    if (cuisine) searchOptions.cuisine = cuisine;
 
     // Prioritize perishable items by sorting them first
     let sortedIngredients = ingredientList;
@@ -39,7 +63,6 @@ router.get('/suggest', authMiddleware, async (req, res) => {
           const aPerish = perishableSet.has(a) ? 0 : 1;
           const bPerish = perishableSet.has(b) ? 0 : 1;
           if (aPerish !== bPerish) return aPerish - bPerish;
-          // Among perishable, oldest first
           if (aPerish === 0 && bPerish === 0) {
             const ageA = itemAgeMap.get(a) || new Date();
             const ageB = itemAgeMap.get(b) || new Date();
@@ -53,14 +76,25 @@ router.get('/suggest', authMiddleware, async (req, res) => {
       debug('[/suggest] Could not load pantry for prioritization, using original order');
     }
 
-    let spoonResults = await spoonacular.findByIngredients(sortedIngredients);
-    debug('[/suggest] spoonacular results:', spoonResults.length);
-    spoonResults = spoonResults.map((r) => ({ ...r, source: 'spoonacular' }));
+    // Try searchRecipes (complexSearch) first, fall back to findByIngredients
+    let spoonResults;
+    try {
+      spoonResults = await spoonacular.searchRecipes(sortedIngredients, searchOptions);
+      debug('[/suggest] searchRecipes results:', spoonResults.length);
+    } catch (err) {
+      debug('[/suggest] searchRecipes failed, falling back to findByIngredients');
+      spoonResults = await spoonacular.findByIngredients(sortedIngredients);
+      spoonResults = spoonResults.map((r) => ({ ...r, source: 'spoonacular' }));
+    }
 
     let aiResults = [];
     if (spoonResults.length < MIN_SPOONACULAR_RESULTS) {
       debug('[/suggest] spoonacular < 3, calling OpenRouter...');
-      aiResults = await openrouter.suggestRecipes(sortedIngredients);
+      aiResults = await openrouter.suggestRecipes(sortedIngredients, {
+        dietaryRestrictions: userPrefs.dietaryRestrictions,
+        householdType: userPrefs.householdType,
+        budgetGoal: userPrefs.budgetGoal,
+      });
       debug('[/suggest] OpenRouter results:', aiResults.length);
     }
 

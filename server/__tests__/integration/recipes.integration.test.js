@@ -92,7 +92,7 @@ describe('Recipe Integration Flow', () => {
         }
       };
 
-      spoonacularService.findByIngredients = jest.fn().mockResolvedValue(mockSuggestions);
+      spoonacularService.searchRecipes = jest.fn().mockResolvedValue(mockSuggestions);
       spoonacularService.getRecipeDetails = jest.fn().mockResolvedValue(mockRecipeDetail);
 
       // Step 1: Get recipe suggestions
@@ -167,7 +167,7 @@ describe('Recipe Integration Flow', () => {
   describe('Recipe Fallback Behavior', () => {
     it('should fallback to OpenRouter when Spoonacular returns < 3 results', async () => {
       // Mock Spoonacular with insufficient results
-      spoonacularService.findByIngredients = jest.fn().mockResolvedValue([
+      spoonacularService.searchRecipes = jest.fn().mockResolvedValue([
         { id: 1, title: 'Recipe 1', image: 'img1.jpg', usedIngredients: ['chicken'] }
       ]);
 
@@ -185,12 +185,16 @@ describe('Recipe Integration Flow', () => {
 
       // Should include both Spoonacular + AI results
       expect(response.body.recipes.length).toBeGreaterThanOrEqual(3);
-      expect(openrouterService.suggestRecipes).toHaveBeenCalledWith(['chicken', 'rice', 'tomatoes']);
+      expect(openrouterService.suggestRecipes).toHaveBeenCalledWith(
+        ['chicken', 'rice', 'tomatoes'],
+        expect.any(Object)
+      );
     });
 
     it('should handle both API failures gracefully', async () => {
       // Mock both APIs failing
-      spoonacularService.findByIngredients = jest.fn().mockRejectedValue(new Error('Spoonacular error'));
+      spoonacularService.searchRecipes = jest.fn().mockRejectedValue(new Error('Spoonacular error'));
+      spoonacularService.findByIngredients = jest.fn().mockRejectedValue(new Error('Spoonacular fallback error'));
       openrouterService.suggestRecipes = jest.fn().mockRejectedValue(new Error('OpenRouter error'));
 
       const response = await request(app)

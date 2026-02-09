@@ -6,7 +6,8 @@ import { useEffect, useState, Suspense } from 'react';
 import api from '@/lib/api';
 import { debug, debugError } from '@/lib/debug';
 import RecipeCard from '@/components/RecipeCard';
-import { motion } from 'framer-motion';
+import RecipeFilters from '@/components/RecipeFilters';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function RecipesContent() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -15,8 +16,17 @@ function RecipesContent() {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  // Map of recipe key -> saved document _id
   const [savedMap, setSavedMap] = useState<Record<string, string>>({});
+  const [toast, setToast] = useState<{ message: string } | null>(null);
+  const [filters, setFilters] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('recipeFilters');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return { mealType: '', maxTime: '', cuisine: '' };
+  });
 
   const ingredients = searchParams.get('ingredients') || '';
 
@@ -31,7 +41,13 @@ function RecipesContent() {
       fetchRecipes();
       fetchSaved();
     }
-  }, [isAuthenticated, ingredients]);
+  }, [isAuthenticated, ingredients, filters]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('recipeFilters', JSON.stringify(filters));
+    }
+  }, [filters]);
 
   const getRecipeKey = (recipe: any) =>
     recipe.sourceId || recipe.id?.toString() || recipe.title;
@@ -54,9 +70,12 @@ function RecipesContent() {
     try {
       setLoading(true);
       setError('');
-      debug('[Recipes] Fetching recipes for ingredients:', ingredients);
-      const data = await api.get(`/recipes/suggest?ingredients=${ingredients}`);
-      debug('[Recipes] Response:', JSON.stringify(data).slice(0, 500));
+      let url = `/recipes/suggest?ingredients=${ingredients}`;
+      if (filters.mealType) url += `&mealType=${filters.mealType}`;
+      if (filters.maxTime) url += `&maxTime=${filters.maxTime}`;
+      if (filters.cuisine) url += `&cuisine=${filters.cuisine}`;
+      debug('[Recipes] Fetching:', url);
+      const data = await api.get(url);
       debug('[Recipes] Recipe count:', data.recipes?.length ?? 'no recipes key');
       setRecipes(data.recipes || []);
     } catch (err: any) {
@@ -69,10 +88,13 @@ function RecipesContent() {
 
   const handleCooked = async (recipe: any) => {
     try {
-      await api.post('/cooking/log', {
+      const result = await api.post('/cooking/log', {
         recipeTitle: recipe.title,
         ingredientsUsed: recipe.ingredients || recipe.usedIngredients || [],
       });
+      const savings = result?.estimatedSavings || 5;
+      setToast({ message: `Nice! You saved ~$${savings} cooking ${recipe.title} at home!` });
+      setTimeout(() => setToast(null), 3000);
     } catch {
       // ignore
     }
@@ -83,7 +105,6 @@ function RecipesContent() {
     const existingId = savedMap[key];
 
     if (existingId) {
-      // Unsave
       debug('[Save] Unsaving recipe:', recipe.title, existingId);
       try {
         await api.delete(`/recipes/saved/${existingId}`);
@@ -96,7 +117,6 @@ function RecipesContent() {
         debugError('[Save] Unsave error:', err.message, err);
       }
     } else {
-      // Save
       const payload = {
         title: recipe.title,
         image: recipe.image,
@@ -131,6 +151,8 @@ function RecipesContent() {
         Based on: {ingredients.split(',').join(', ')}
       </p>
 
+      <RecipeFilters filters={filters} onChange={setFilters} />
+
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
       {recipes.length === 0 && !error ? (
@@ -156,6 +178,21 @@ function RecipesContent() {
           ))}
         </div>
       )}
+
+      {/* Toast notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg text-sm font-medium z-50"
+            role="status"
+          >
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

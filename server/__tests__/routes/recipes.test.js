@@ -60,8 +60,8 @@ describe('GET /api/recipes/suggest', () => {
     expect(res.status).toBe(400);
   });
 
-  test('calls Spoonacular with parsed ingredients', async () => {
-    spoonacular.findByIngredients.mockResolvedValue([
+  test('calls searchRecipes with parsed ingredients', async () => {
+    spoonacular.searchRecipes.mockResolvedValue([
       { id: 1, title: 'R1', image: null, usedIngredients: [], missedIngredients: [] },
       { id: 2, title: 'R2', image: null, usedIngredients: [], missedIngredients: [] },
       { id: 3, title: 'R3', image: null, usedIngredients: [], missedIngredients: [] },
@@ -71,11 +71,14 @@ describe('GET /api/recipes/suggest', () => {
       .get('/api/recipes/suggest?ingredients=chicken,rice')
       .set('Cookie', `token=${token}`);
 
-    expect(spoonacular.findByIngredients).toHaveBeenCalledWith(['chicken', 'rice']);
+    expect(spoonacular.searchRecipes).toHaveBeenCalledWith(
+      ['chicken', 'rice'],
+      expect.any(Object)
+    );
   });
 
-  test('returns Spoonacular results without AI if 3+ results', async () => {
-    spoonacular.findByIngredients.mockResolvedValue([
+  test('returns results without AI if 3+ results', async () => {
+    spoonacular.searchRecipes.mockResolvedValue([
       { id: 1, title: 'R1' }, { id: 2, title: 'R2' }, { id: 3, title: 'R3' },
     ]);
 
@@ -88,8 +91,8 @@ describe('GET /api/recipes/suggest', () => {
     expect(openrouter.suggestRecipes).not.toHaveBeenCalled();
   });
 
-  test('calls OpenRouter if Spoonacular returns < 3 results', async () => {
-    spoonacular.findByIngredients.mockResolvedValue([{ id: 1, title: 'R1' }]);
+  test('calls OpenRouter if searchRecipes returns < 3 results', async () => {
+    spoonacular.searchRecipes.mockResolvedValue([{ id: 1, title: 'R1' }]);
     openrouter.suggestRecipes.mockResolvedValue([
       { title: 'AI Recipe', source: 'ai', sourceId: null },
     ]);
@@ -103,8 +106,8 @@ describe('GET /api/recipes/suggest', () => {
   });
 
   test('merges results and marks source', async () => {
-    spoonacular.findByIngredients.mockResolvedValue([
-      { id: 1, title: 'Spoon Recipe' },
+    spoonacular.searchRecipes.mockResolvedValue([
+      { id: 1, title: 'Spoon Recipe', source: 'spoonacular' },
     ]);
     openrouter.suggestRecipes.mockResolvedValue([
       { title: 'AI Recipe', source: 'ai', sourceId: null },
@@ -114,12 +117,12 @@ describe('GET /api/recipes/suggest', () => {
       .get('/api/recipes/suggest?ingredients=chicken')
       .set('Cookie', `token=${token}`);
 
-    const sources = res.body.recipes.map((r) => r.source || 'spoonacular');
+    const sources = res.body.recipes.map((r) => r.source);
     expect(sources).toContain('ai');
   });
 
   test('handles both services failing', async () => {
-    spoonacular.findByIngredients.mockResolvedValue([]);
+    spoonacular.searchRecipes.mockResolvedValue([]);
     openrouter.suggestRecipes.mockResolvedValue([]);
 
     const res = await request(app)
@@ -128,6 +131,79 @@ describe('GET /api/recipes/suggest', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.recipes).toEqual([]);
+  });
+
+  test('passes user dietary restrictions to searchRecipes', async () => {
+    // Update user with dietary preferences
+    await User.findByIdAndUpdate(user._id, {
+      'preferences.dietaryRestrictions': ['vegetarian', 'gluten-free'],
+    });
+
+    spoonacular.searchRecipes.mockResolvedValue([
+      { id: 1, title: 'R1' }, { id: 2, title: 'R2' }, { id: 3, title: 'R3' },
+    ]);
+
+    await request(app)
+      .get('/api/recipes/suggest?ingredients=tofu')
+      .set('Cookie', `token=${token}`);
+
+    const options = spoonacular.searchRecipes.mock.calls[0][1];
+    expect(options.diet).toBe('vegetarian');
+    expect(options.intolerances).toBe('gluten');
+  });
+
+  test('passes filter query params to searchRecipes', async () => {
+    spoonacular.searchRecipes.mockResolvedValue([
+      { id: 1, title: 'R1' }, { id: 2, title: 'R2' }, { id: 3, title: 'R3' },
+    ]);
+
+    await request(app)
+      .get('/api/recipes/suggest?ingredients=chicken&mealType=dinner&maxTime=30&cuisine=italian')
+      .set('Cookie', `token=${token}`);
+
+    const options = spoonacular.searchRecipes.mock.calls[0][1];
+    expect(options.type).toBe('dinner');
+    expect(options.maxReadyTime).toBe(30);
+    expect(options.cuisine).toBe('italian');
+  });
+
+  test('passes user preferences to OpenRouter fallback', async () => {
+    await User.findByIdAndUpdate(user._id, {
+      'preferences.dietaryRestrictions': ['vegan'],
+      'preferences.householdType': 'couple',
+      'preferences.budgetGoal': 'low',
+    });
+
+    spoonacular.searchRecipes.mockResolvedValue([]);
+    openrouter.suggestRecipes.mockResolvedValue([
+      { title: 'AI Vegan', source: 'ai', sourceId: null },
+    ]);
+
+    await request(app)
+      .get('/api/recipes/suggest?ingredients=beans')
+      .set('Cookie', `token=${token}`);
+
+    const prefs = openrouter.suggestRecipes.mock.calls[0][1];
+    expect(prefs.dietaryRestrictions).toEqual(['vegan']);
+    expect(prefs.householdType).toBe('couple');
+    expect(prefs.budgetGoal).toBe('low');
+  });
+
+  test('falls back to findByIngredients if searchRecipes fails', async () => {
+    spoonacular.searchRecipes.mockRejectedValue(new Error('complexSearch failed'));
+    spoonacular.findByIngredients.mockResolvedValue([
+      { id: 1, title: 'Fallback', usedIngredients: [], missedIngredients: [] },
+      { id: 2, title: 'F2', usedIngredients: [], missedIngredients: [] },
+      { id: 3, title: 'F3', usedIngredients: [], missedIngredients: [] },
+    ]);
+
+    const res = await request(app)
+      .get('/api/recipes/suggest?ingredients=chicken')
+      .set('Cookie', `token=${token}`);
+
+    expect(res.status).toBe(200);
+    expect(spoonacular.findByIngredients).toHaveBeenCalled();
+    expect(res.body.recipes.length).toBeGreaterThanOrEqual(1);
   });
 });
 

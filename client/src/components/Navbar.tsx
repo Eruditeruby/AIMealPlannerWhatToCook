@@ -16,6 +16,8 @@ export default function Navbar() {
     { href: '/pantry', label: 'Pantry' },
     { href: '/recipes', label: 'Recipes' },
     { href: '/favorites', label: 'Favorites' },
+    { href: '/settings', label: 'Settings' },
+    { href: '/history', label: 'History' },
   ];
 
   return (

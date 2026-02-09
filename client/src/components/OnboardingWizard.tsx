@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Wallet, Leaf, ChevronRight, ChevronLeft, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import api from '@/lib/api';
+import { HOUSEHOLD_OPTIONS, BUDGET_OPTIONS, DIETARY_OPTIONS } from '@/data/preferenceOptions';
 
 interface OnboardingWizardProps {
   onComplete: () => void;
@@ -17,36 +18,21 @@ const STEPS = [
     title: 'Who are you cooking for?',
     subtitle: 'This helps us suggest the right portion sizes',
     icon: Users,
-    options: [
-      { value: 'single', label: 'Just me', emoji: '🧑' },
-      { value: 'couple', label: 'Two of us', emoji: '👫' },
-      { value: 'family-small', label: 'Family (3-4)', emoji: '👨‍👩‍👧' },
-      { value: 'family-large', label: 'Family (5+)', emoji: '👨‍👩‍👧‍👦' },
-    ],
+    options: HOUSEHOLD_OPTIONS,
   },
   {
     key: 'budgetGoal',
     title: "What's your grocery budget?",
     subtitle: "We'll prioritize recipes that match your budget",
     icon: Wallet,
-    options: [
-      { value: 'low', label: 'Budget-friendly', emoji: '💰' },
-      { value: 'medium', label: 'Moderate', emoji: '💵' },
-      { value: 'high', label: 'No limit', emoji: '✨' },
-    ],
+    options: BUDGET_OPTIONS,
   },
   {
     key: 'dietaryRestrictions',
     title: 'Any dietary needs?',
     subtitle: 'Select all that apply (or skip)',
     icon: Leaf,
-    options: [
-      { value: 'vegetarian', label: 'Vegetarian', emoji: '🥬' },
-      { value: 'vegan', label: 'Vegan', emoji: '🌱' },
-      { value: 'gluten-free', label: 'Gluten-free', emoji: '🌾' },
-      { value: 'dairy-free', label: 'Dairy-free', emoji: '🥛' },
-      { value: 'nut-free', label: 'Nut-free', emoji: '🥜' },
-    ],
+    options: DIETARY_OPTIONS,
     multiSelect: true,
   },
 ] as const;

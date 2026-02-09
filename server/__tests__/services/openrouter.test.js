@@ -92,4 +92,53 @@ describe('OpenRouter AI Client', () => {
     const results = await openrouter.suggestRecipes([]);
     expect(results).toEqual([]);
   });
+
+  test('prompt includes dietary restrictions when provided', async () => {
+    global.fetch.mockResolvedValueOnce(mockAIResponse([]));
+
+    await openrouter.suggestRecipes(['chicken'], {
+      dietaryRestrictions: ['vegetarian', 'gluten-free'],
+    });
+
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+    const prompt = body.messages[0].content;
+    expect(prompt).toContain('vegetarian');
+    expect(prompt).toContain('gluten-free');
+  });
+
+  test('prompt includes household type when provided', async () => {
+    global.fetch.mockResolvedValueOnce(mockAIResponse([]));
+
+    await openrouter.suggestRecipes(['rice'], {
+      householdType: 'family-small',
+    });
+
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+    const prompt = body.messages[0].content;
+    expect(prompt).toContain('family-small');
+  });
+
+  test('prompt includes budget goal when provided', async () => {
+    global.fetch.mockResolvedValueOnce(mockAIResponse([]));
+
+    await openrouter.suggestRecipes(['beans'], {
+      budgetGoal: 'low',
+    });
+
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+    const prompt = body.messages[0].content;
+    expect(prompt.toLowerCase()).toContain('budget');
+  });
+
+  test('prompt omits preference lines when not set', async () => {
+    global.fetch.mockResolvedValueOnce(mockAIResponse([]));
+
+    await openrouter.suggestRecipes(['chicken'], {});
+
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+    const prompt = body.messages[0].content;
+    expect(prompt).not.toContain('Dietary requirements');
+    expect(prompt).not.toContain('Household');
+    expect(prompt).not.toContain('Budget');
+  });
 });

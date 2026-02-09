@@ -144,6 +144,8 @@ describe('Navbar', () => {
     expect(screen.getByText('Pantry')).toBeInTheDocument();
     expect(screen.getByText('Recipes')).toBeInTheDocument();
     expect(screen.getByText('Favorites')).toBeInTheDocument();
+    expect(screen.getByText('Settings')).toBeInTheDocument();
+    expect(screen.getByText('History')).toBeInTheDocument();
   });
 
   it('does not show nav links when not authenticated', async () => {
@@ -162,6 +164,8 @@ describe('Navbar', () => {
     expect(screen.queryByText('Pantry')).not.toBeInTheDocument();
     expect(screen.queryByText('Recipes')).not.toBeInTheDocument();
     expect(screen.queryByText('Favorites')).not.toBeInTheDocument();
+    expect(screen.queryByText('Settings')).not.toBeInTheDocument();
+    expect(screen.queryByText('History')).not.toBeInTheDocument();
   });
 
   it('includes ThemeToggle', async () => {

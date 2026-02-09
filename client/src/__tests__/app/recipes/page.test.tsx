@@ -25,7 +25,24 @@ jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
+jest.mock('@/components/RecipeFilters', () => {
+  return function MockRecipeFilters({ filters, onChange }: any) {
+    return (
+      <div data-testid="recipe-filters">
+        <select
+          data-testid="meal-filter"
+          value={filters.mealType}
+          onChange={(e) => onChange({ ...filters, mealType: e.target.value })}
+        >
+          <option value="">Any</option>
+          <option value="dinner">Dinner</option>
+        </select>
+      </div>
+    );
+  };
+});
 jest.mock('@/components/ui/Card', () => {
   return function MockCard({ children }: any) {
     return <div>{children}</div>;
@@ -301,6 +318,78 @@ describe('Recipes page', () => {
         title: 'Tomato Soup',
         source: 'spoonacular',
       }));
+    });
+  });
+
+  it('renders RecipeFilters component', async () => {
+    (api.get as jest.Mock)
+      .mockResolvedValueOnce(mockUser)
+      .mockResolvedValueOnce({ recipes: mockRecipes })
+      .mockResolvedValueOnce([]);
+
+    render(
+      <AuthProvider>
+        <RecipesPage />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('recipe-filters')).toBeInTheDocument();
+    });
+  });
+
+  it('includes filter params in API call when filter changes', async () => {
+    (api.get as jest.Mock).mockImplementation((url: string) => {
+      if (url === '/auth/me') return Promise.resolve(mockUser);
+      if (url.startsWith('/recipes/suggest')) return Promise.resolve({ recipes: mockRecipes });
+      if (url === '/recipes/saved') return Promise.resolve([]);
+      return Promise.reject(new Error('Unknown URL'));
+    });
+
+    const user = userEvent.setup();
+    render(
+      <AuthProvider>
+        <RecipesPage />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Tomato Soup')).toBeInTheDocument();
+    });
+
+    // Change the meal filter
+    await user.selectOptions(screen.getByTestId('meal-filter'), 'dinner');
+
+    await waitFor(() => {
+      const calls = (api.get as jest.Mock).mock.calls.map((c: any) => c[0]);
+      expect(calls.some((url: string) => url.includes('mealType=dinner'))).toBe(true);
+    });
+  });
+
+  it('shows toast after cooking a recipe', async () => {
+    (api.get as jest.Mock)
+      .mockResolvedValueOnce(mockUser)
+      .mockResolvedValueOnce({ recipes: mockRecipes })
+      .mockResolvedValueOnce([]);
+    (api.post as jest.Mock).mockResolvedValue({ estimatedSavings: 8 });
+
+    const user = userEvent.setup();
+    render(
+      <AuthProvider>
+        <RecipesPage />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Tomato Soup')).toBeInTheDocument();
+    });
+
+    const cookButtons = screen.getAllByRole('button', { name: /cooked/i });
+    await user.click(cookButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toBeInTheDocument();
+      expect(screen.getByText(/saved ~\$8/i)).toBeInTheDocument();
     });
   });
 

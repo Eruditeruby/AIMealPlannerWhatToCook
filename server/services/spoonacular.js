@@ -76,6 +76,69 @@ const findByIngredients = async (ingredients) => {
   }
 };
 
+const searchRecipes = async (ingredients, options = {}) => {
+  if (!ingredients || ingredients.length === 0) return [];
+
+  const params = new URLSearchParams({
+    includeIngredients: ingredients.join(','),
+    number: '10',
+    addRecipeInformation: 'true',
+    fillIngredients: 'true',
+    sort: 'max-used-ingredients',
+    apiKey: process.env.SPOONACULAR_API_KEY,
+  });
+
+  if (options.diet) params.set('diet', options.diet);
+  if (options.intolerances) params.set('intolerances', options.intolerances);
+  if (options.cuisine) params.set('cuisine', options.cuisine);
+  if (options.type) params.set('type', options.type);
+  if (options.maxReadyTime) params.set('maxReadyTime', String(options.maxReadyTime));
+
+  const cacheKey = `complexSearch:${params.toString()}`;
+  const cached = getFromCache(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const url = `${BASE_URL}/complexSearch?${params.toString()}`;
+    debug('[Spoonacular] complexSearch URL (no key):', url.replace(process.env.SPOONACULAR_API_KEY || '', '***'));
+    const res = await fetch(url, { method: 'GET' });
+    debug('[Spoonacular] complexSearch status:', res.status, res.statusText);
+
+    if (!res.ok) {
+      const errorBody = await res.text();
+      debugError('[Spoonacular] complexSearch error:', errorBody.slice(0, 300));
+      return [];
+    }
+
+    const data = await res.json();
+    debug('[Spoonacular] complexSearch results:', data.results?.length);
+
+    const results = (data.results || []).map((r) => ({
+      id: r.id,
+      title: r.title,
+      image: r.image,
+      source: 'spoonacular',
+      sourceId: String(r.id),
+      cookTime: r.readyInMinutes || null,
+      servings: r.servings || null,
+      usedIngredients: r.usedIngredients?.map((i) => i.name) || [],
+      missedIngredients: r.missedIngredients?.map((i) => i.name) || [],
+      nutrition: r.nutrition ? {
+        calories: r.nutrition.nutrients?.find((n) => n.name === 'Calories')?.amount,
+        protein: r.nutrition.nutrients?.find((n) => n.name === 'Protein')?.amount,
+        carbs: r.nutrition.nutrients?.find((n) => n.name === 'Carbohydrates')?.amount,
+        fat: r.nutrition.nutrients?.find((n) => n.name === 'Fat')?.amount,
+      } : null,
+    }));
+
+    setCache(cacheKey, results);
+    return results;
+  } catch (err) {
+    console.error('Spoonacular searchRecipes error:', err.message);
+    return [];
+  }
+};
+
 const getRecipeDetails = async (id) => {
   // Check cache first
   const cacheKey = getCacheKey('detail', id);
@@ -117,4 +180,6 @@ const getRecipeDetails = async (id) => {
   }
 };
 
-module.exports = { findByIngredients, getRecipeDetails };
+const clearCache = () => cache.clear();
+
+module.exports = { findByIngredients, searchRecipes, getRecipeDetails, clearCache };

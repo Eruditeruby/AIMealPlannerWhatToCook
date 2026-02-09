@@ -1,8 +1,8 @@
 const { debug, debugError } = require('../utils/debug');
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-const buildPrompt = (ingredients) => {
-  return `You are a family-friendly recipe assistant. Suggest 3-5 recipes using these ingredients: ${ingredients.join(', ')}.
+const buildPrompt = (ingredients, preferences = {}) => {
+  let prompt = `You are a family-friendly recipe assistant. Suggest 3-5 recipes using these ingredients: ${ingredients.join(', ')}.
 
 Return ONLY valid JSON in this exact format:
 {
@@ -20,10 +20,29 @@ Return ONLY valid JSON in this exact format:
   ]
 }
 
-Focus on simple, kid-friendly, family-friendly meals. Include nutrition estimates.`;
+Focus on simple, family-friendly meals. Include nutrition estimates.`;
+
+  const lines = [];
+  if (preferences.dietaryRestrictions?.length) {
+    lines.push(`Dietary requirements: [${preferences.dietaryRestrictions.join(', ')}] (STRICT — never violate these).`);
+  }
+  if (preferences.householdType) {
+    const sizeMap = { single: '1 person', couple: '2 people', 'family-small': '3-4 people', 'family-large': '5+ people' };
+    lines.push(`Household: [${preferences.householdType}] — suggest portions for ${sizeMap[preferences.householdType] || '4 people'}.`);
+  }
+  if (preferences.budgetGoal) {
+    const budgetDesc = { low: 'prioritize affordable ingredients', medium: 'balance cost and variety', high: 'no cost constraints' };
+    lines.push(`Budget: [${preferences.budgetGoal}] — ${budgetDesc[preferences.budgetGoal] || 'balance cost and variety'}.`);
+  }
+
+  if (lines.length > 0) {
+    prompt += '\n' + lines.join('\n');
+  }
+
+  return prompt;
 };
 
-const suggestRecipes = async (ingredients) => {
+const suggestRecipes = async (ingredients, preferences = {}) => {
   if (!ingredients || ingredients.length === 0) return [];
 
   try {
@@ -37,7 +56,7 @@ const suggestRecipes = async (ingredients) => {
       },
       body: JSON.stringify({
         model: 'meta-llama/llama-3.1-8b-instruct:free',
-        messages: [{ role: 'user', content: buildPrompt(ingredients) }],
+        messages: [{ role: 'user', content: buildPrompt(ingredients, preferences) }],
       }),
     });
     debug('[OpenRouter] Response status:', res.status, res.statusText);
