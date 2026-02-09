@@ -5,13 +5,15 @@ A meal planner for busy families that helps you cook what you already have — s
 ## Features
 
 - **Cook What You Have** — AI-powered recipe suggestions from your pantry ingredients
-- **Reduce Food Waste** — Track what needs using soon so nothing goes to waste
-- **Pantry Management** — Track ingredients with autocomplete (~350 ingredients)
+- **Reduce Food Waste** — Freshness badges ("Use soon", "Use today!") so nothing expires unused
+- **Track Savings** — Log cooked meals and see weekly/monthly/total savings ($5/meal estimate)
+- **Pantry Management** — Track ingredients with autocomplete (~350 items), auto-enriched with category & perishability
+- **Onboarding Wizard** — 3-step setup (family size, budget, dietary restrictions)
 - **Save Favorites** — Build your family recipe book
 - **Google OAuth** — Secure login with Google
 - **Dark/Light Mode** — Smooth theme switching with CSS variables
 - **Responsive Design** — Mobile-first layout with Tailwind CSS
-- **Framer Motion** — Smooth page transitions and animations
+- **SEO Optimized** — Open Graph, Twitter cards, food-waste-reduction keywords
 
 ## Tech Stack
 
@@ -34,11 +36,12 @@ AIMealPlannerWhatToCook/
 ├── server/                 # Express API backend
 │   ├── config/            # db.js, passport.js
 │   ├── middleware/        # auth.js (JWT verification)
-│   ├── models/            # User, Pantry, SavedRecipe
-│   ├── routes/            # auth, pantry, recipes
+│   ├── models/            # User, Pantry, SavedRecipe, CookingLog
+│   ├── routes/            # auth, pantry, recipes, cooking
+│   ├── data/              # ingredientMeta.js (300+ items)
 │   ├── services/          # spoonacular.js, openrouter.js
 │   ├── utils/             # token.js, debug.js
-│   ├── __tests__/         # 13 suites, 86 tests
+│   ├── __tests__/         # 21 suites, 160 tests
 │   └── index.js           # Entry point
 ├── client/                # Next.js 15 frontend
 │   └── src/
@@ -47,7 +50,7 @@ AIMealPlannerWhatToCook/
 │       ├── context/       # AuthContext, ThemeContext
 │       ├── data/          # Static data (ingredients list)
 │       ├── lib/           # API client, debug utility
-│       └── __tests__/     # 18 suites, 193 tests
+│       └── __tests__/     # 20 suites, 221 tests
 ├── design.md              # Architecture & design spec
 ├── workflow.md            # TDD implementation workflow
 └── PROJECT_INDEX.md       # Session bootstrapping index
@@ -123,29 +126,30 @@ See `.env.example` for the full list. Required:
 | GET | `/api/recipes/saved` | Yes | Get saved recipes |
 | POST | `/api/recipes/saved` | Yes | Save a recipe |
 | DELETE | `/api/recipes/saved/:id` | Yes | Remove saved recipe |
+| GET | `/api/auth/preferences` | Yes | Get user preferences |
+| PUT | `/api/auth/preferences` | Yes | Update user preferences |
+| POST | `/api/cooking/log` | Yes | Log a cooked recipe |
+| GET | `/api/cooking/history` | Yes | Get cooking history |
+| GET | `/api/cooking/savings` | Yes | Get savings summary |
 | GET | `/api/health` | No | Health check |
 
 ## Testing
 
 ```bash
-# Server tests (86 tests, 13 suites)
+# Server tests (160 tests, 21 suites)
 cd server && npm test
 
-# Client tests (193 tests, 18 suites)
+# Client tests (221 tests, 20 suites)
 cd client && npm test
 
-# Integration tests (18 tests, 3 suites)
+# Integration tests
 npm run test:integration
 
-# E2E tests (18+ tests, requires live servers)
+# E2E tests (requires live servers)
 npm run test:e2e
-
-# With coverage
-cd server && npm test -- --coverage    # 83% statements
-cd client && npm test -- --coverage    # 94% statements, 95% lines
 ```
 
-**Total: 315+ tests across 33+ suites — all passing**
+**Total: 381 tests across 41 suites — all passing**
 
 ## Development Status
 
@@ -165,6 +169,13 @@ cd client && npm test -- --coverage    # 94% statements, 95% lines
 - [x] Phase 13: Landing page & layout
 - [x] Phase 14: Integration testing (18/18 passing, E2E infrastructure complete)
 - [x] Phase 15: Polish & deployment ready
+
+### Positioning Workflow (Post-MVP)
+- [x] Phase 1: Messaging & brand pivot — food waste reduction narrative
+- [x] Phase 2: User preferences & onboarding wizard
+- [x] Phase 3: Pantry freshness tracking & urgency badges
+- [x] Phase 4: Savings tracker & "I Cooked This!" feature
+- [x] Phase 5: Content, SEO & social sharing meta
 
 ## Deployment
 

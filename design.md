@@ -47,9 +47,9 @@ Ingredient input → AI recipe suggestions, with Google auth and persistent pant
 ┌──────────────────▼──────────────────────────────┐
 │               MongoDB                            │
 │  ┌──────┐ ┌────────┐ ┌──────────────────┐       │
-│  │Users │ │Pantries│ │ SavedRecipes     │       │
-│  └──────┘ └────────┘ └──────────────────┘       │
-└─────────────────────────────────────────────────┘
+│  │Users │ │Pantries│ │SavedRecipes│ │CookingLogs│  │
+│  └──────┘ └────────┘ └────────────┘ └───────────┘  │
+└─────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -97,11 +97,15 @@ AIMealPlannerWhatToCook/
 │   ├── models/
 │   │   ├── User.js
 │   │   ├── Pantry.js
-│   │   └── SavedRecipe.js
+│   │   ├── SavedRecipe.js
+│   │   └── CookingLog.js
 │   ├── routes/
 │   │   ├── auth.js
 │   │   ├── pantry.js
-│   │   └── recipes.js
+│   │   ├── recipes.js
+│   │   └── cooking.js
+│   ├── data/
+│   │   └── ingredientMeta.js
 │   └── services/
 │       ├── spoonacular.js     # Spoonacular API client
 │       └── openrouter.js      # OpenRouter AI client

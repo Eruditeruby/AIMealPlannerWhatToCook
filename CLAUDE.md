@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Family-focused AI meal planner that suggests recipes based on available ingredients, with persistent pantry tracking and nutritional insights.
+Family-focused AI meal planner that helps busy parents cook what they already have — saving money, reducing food waste, and ending the nightly "what's for dinner?" stress.
 
 ## Tech Stack
 
@@ -29,9 +29,10 @@ AIMealPlannerWhatToCook/
 ├── server/          # Express API backend
 │   ├── config/      # db.js, passport.js
 │   ├── middleware/   # auth.js (JWT verification)
-│   ├── models/      # User, Pantry, SavedRecipe (Mongoose)
-│   ├── routes/      # auth, pantry, recipes
+│   ├── models/      # User, Pantry, SavedRecipe, CookingLog
+│   ├── routes/      # auth, pantry, recipes, cooking
 │   ├── services/    # spoonacular.js, openrouter.js
+│   ├── data/        # ingredientMeta.js (300+ items)
 │   └── utils/       # token.js, debug.js
 ├── design.md        # Full architecture & design spec
 ├── workflow.md      # TDD implementation workflow (15 phases)
@@ -40,7 +41,7 @@ AIMealPlannerWhatToCook/
 
 ## Key Design Decisions
 
-- Pantry tracks **item names only** (no quantities) with autocomplete (~350 ingredients)
+- Pantry tracks items with metadata (name, addedAt, category, perishable) and autocomplete (~350 ingredients)
 - Recipe flow: Spoonacular first → OpenRouter AI fallback if < 3 results
 - Dark/light mode via CSS variables + `data-theme` attribute
 - Minimalist UI with smooth Framer Motion transitions
@@ -48,9 +49,10 @@ AIMealPlannerWhatToCook/
 
 ## Database Collections
 
-- **Users**: googleId, email, name, avatar, preferences (dietaryRestrictions, familySize)
-- **Pantries**: userId, items (string array), timestamps
+- **Users**: googleId, email, name, avatar, preferences (dietaryRestrictions, familySize, budgetGoal, cookingSkill, householdType, onboardingComplete)
+- **Pantries**: userId, items [{name, addedAt, category, perishable}], timestamps
 - **SavedRecipes**: userId, title, image, source, instructions, ingredients, cookTime, servings, tags, nutrition
+- **CookingLogs**: userId, recipeTitle, ingredientsUsed, estimatedSavings, cookedAt
 
 ## API Routes
 
@@ -64,6 +66,10 @@ AIMealPlannerWhatToCook/
 | GET | /api/recipes/suggest?ingredients=... | Yes |
 | GET | /api/recipes/:id | Yes |
 | GET/POST/DELETE | /api/recipes/saved | Yes |
+| GET/PUT | /api/auth/preferences | Yes |
+| POST | /api/cooking/log | Yes |
+| GET | /api/cooking/history | Yes |
+| GET | /api/cooking/savings | Yes |
 
 ## Environment Variables
 
@@ -80,7 +86,7 @@ Optional:
 
 ## Development Methodology
 
-**TDD (Test-Driven Development)**: Red → Green → Refactor for every feature. See `workflow.md` for the full 15-phase plan. Actual test count: 279 tests (exceeded the ~140 estimate).
+**TDD (Test-Driven Development)**: Red → Green → Refactor for every feature. See `workflow.md` for the 15-phase core plan + `claudedocs/workflow_positioning.md` for the 5-phase positioning strategy.
 
 ## Commands
 
@@ -99,13 +105,14 @@ cd client && npm run dev           # Dev server (Next.js)
 - [x] Project initialized (LICENSE, README)
 - [x] Design spec complete (design.md)
 - [x] TDD workflow defined (workflow.md)
-- [x] Phase 0: Scaffolding & test infrastructure
-- [x] Phase 1-7: Server implementation (86 tests, 13 suites, 83% coverage)
-- [x] Phase 8-13: Client implementation (193 tests, 18 suites, 94% coverage)
-- [ ] Phase 14: Integration testing
-- [ ] Phase 15: Polish & deployment
+- [x] Phase 0-15: Core app complete (production ready)
+- [x] Positioning Phase 1: Messaging & brand pivot
+- [x] Positioning Phase 2: User preferences & onboarding
+- [x] Positioning Phase 3: Pantry freshness & urgency badges
+- [x] Positioning Phase 4: Savings tracker & cooking log
+- [x] Positioning Phase 5: Content, SEO & social sharing
 
-**Total: 279 tests across 31 suites — all passing**
+**Total: 381 tests across 41 suites — all passing**
 
 ## Conventions
 
