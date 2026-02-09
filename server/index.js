@@ -17,8 +17,19 @@ if (process.env.GOOGLE_CLIENT_ID) {
 // Trust proxy (Railway, Render, etc. run behind reverse proxies)
 app.set('trust proxy', 1);
 
-// Security headers
-app.use(helmet());
+// Security headers with CSP
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
 
 // Rate limiting — global
 const limiter = rateLimit({
@@ -66,6 +77,17 @@ app.get('/api/health', (req, res) => {
 });
 app.use('/api/auth', authLimiter, require('./routes/auth'));
 app.use('/api/pantry', require('./routes/pantry'));
+
+// Recipe-specific rate limit (expensive external API calls)
+const recipeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many recipe requests, please try again later' },
+});
+app.use('/api/recipes/suggest', recipeLimiter);
+
 app.use('/api/recipes', require('./routes/recipes'));
 app.use('/api/cooking', require('./routes/cooking'));
 

@@ -71,7 +71,7 @@ describe('RecipeDetail', () => {
   it('renders instructions', () => {
     render(<RecipeDetail recipe={mockRecipe} />);
     expect(screen.getByText('Instructions')).toBeInTheDocument();
-    expect(screen.getByText('Boil pasta')).toBeInTheDocument();
+    expect(screen.getByText(/Boil pasta/)).toBeInTheDocument();
   });
 
   it('renders cook time', () => {

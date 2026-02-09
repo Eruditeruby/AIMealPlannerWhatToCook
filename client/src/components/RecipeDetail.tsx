@@ -91,10 +91,9 @@ export default function RecipeDetail({ recipe, onSave, isSaved }: RecipeDetailPr
 
       <div>
         <h2 className="text-lg font-semibold mb-3">Instructions</h2>
-        <div
-          className="text-[var(--text-secondary)] leading-relaxed whitespace-pre-line"
-          dangerouslySetInnerHTML={{ __html: recipe.instructions }}
-        />
+        <p className="text-[var(--text-secondary)] leading-relaxed whitespace-pre-line">
+          {recipe.instructions.replace(/<[^>]*>/g, '')}
+        </p>
       </div>
     </div>
   );

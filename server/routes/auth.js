@@ -41,7 +41,8 @@ router.get(
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      ...(process.env.COOKIE_DOMAIN && { domain: process.env.COOKIE_DOMAIN }),
     };
     debug('[Auth] Setting cookie. Secure:', cookieOptions.secure, 'SameSite:', cookieOptions.sameSite);
     debug('[Auth] Redirecting to:', process.env.CLIENT_URL || 'http://localhost:3000');
@@ -126,7 +127,7 @@ router.put('/preferences', authMiddleware, async (req, res) => {
     res.json({ preferences: user.preferences });
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: process.env.NODE_ENV === 'production' ? 'Invalid input' : err.message });
     }
     debugError('[Auth] PUT /preferences error:', err.message);
     res.status(500).json({ error: 'Server error' });

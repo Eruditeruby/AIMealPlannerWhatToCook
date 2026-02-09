@@ -16,6 +16,14 @@ router.post('/log', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'recipeTitle and ingredientsUsed are required' });
     }
 
+    if (typeof recipeTitle !== 'string' || recipeTitle.length > 200) {
+      return res.status(400).json({ error: 'recipeTitle must be a string (max 200 characters)' });
+    }
+
+    if (!Array.isArray(ingredientsUsed) || ingredientsUsed.length > 100) {
+      return res.status(400).json({ error: 'ingredientsUsed must be an array (max 100 items)' });
+    }
+
     const log = await CookingLog.create({
       userId: req.user.userId,
       recipeTitle,

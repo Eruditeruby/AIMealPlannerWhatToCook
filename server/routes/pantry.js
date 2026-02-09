@@ -30,8 +30,12 @@ router.put('/', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Items must be an array' });
     }
 
-    if (!items.every((item) => typeof item === 'string')) {
-      return res.status(400).json({ error: 'All items must be strings' });
+    if (items.length > 500) {
+      return res.status(400).json({ error: 'Maximum 500 items allowed' });
+    }
+
+    if (!items.every((item) => typeof item === 'string' && item.length <= 100)) {
+      return res.status(400).json({ error: 'All items must be strings (max 100 characters)' });
     }
 
     // Normalize: trim, lowercase, deduplicate

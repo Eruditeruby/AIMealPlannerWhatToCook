@@ -45,7 +45,7 @@ const findByIngredients = async (ingredients) => {
 
   try {
     const apiKey = process.env.SPOONACULAR_API_KEY;
-    debug('[Spoonacular] API key present:', !!apiKey, 'length:', apiKey?.length);
+    debug('[Spoonacular] API key present:', !!apiKey);
     const url = `${BASE_URL}/findByIngredients?ingredients=${ingredients.join(',')}&number=10&ranking=1&apiKey=${apiKey}`;
     debug('[Spoonacular] Request URL (no key):', url.replace(apiKey || '', '***'));
     const res = await fetch(url, { method: 'GET' });
